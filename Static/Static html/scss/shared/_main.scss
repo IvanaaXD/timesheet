@@ -1,0 +1,32 @@
+//----------  reports
+//------------------------------------------------------------------------------
+
+.reports {
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+//----------  members page
+//------------------------------------------------------------------------------
+
+.new-member-wrap {
+	display: none;
+}
+.new-member-inner {
+	width: 450px;
+	overflow: auto;
+	.form {
+		border-bottom: 1px solid $grey-light;
+		padding-bottom: 15px;
+		margin: 0 0 15px;
+		width: 100%;
+		input[type='text'] {
+			width: 100%;
+		}
+	}
+	.buttons {
+		.inner {
+			text-align: center;
+		}
+	}
+}

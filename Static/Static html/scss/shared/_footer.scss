@@ -1,0 +1,29 @@
+//----------  footer
+//------------------------------------------------------------------------------
+
+.footer {
+	width: 100%;
+	overflow: hidden;
+	height: 30px;
+	line-height: 30px;
+	margin-top: 20px;
+	border-top: 1px solid $white;
+	color: $white;
+	font-size: 11px;
+	background: $grey-dark;
+	ul {
+		li {
+			float: left;
+			margin-right: 10px;
+			a {
+				color: $white;
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+			&.last {
+				margin-right: 0;
+			}
+		}
+	}
+}

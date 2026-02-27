@@ -1,0 +1,131 @@
+//----------  forms
+//------------------------------------------------------------------------------
+
+.in-text,
+.in-pass,
+.in-search {
+	background-color: $white;
+	border: solid 1px $grey-light;
+	padding: 0 5px;
+	width: 180px;
+	height: 28px;
+}
+.in-text {
+	&.large {
+		width: 310px;
+	}
+	&.small {
+		width: 100px;
+	}
+	&.xsmall {
+		width: 45px;
+	}
+}
+.in-pass,
+.in-search {
+	width: 280px;
+	background-image: url('../img/icons/pass.png');
+	background-repeat: no-repeat;
+	background-position: 7px 5px;
+	display: block;
+	padding-left: 30px;
+}
+.in-search {
+	background-image: url('../img/icons/search.png');
+	width: 250px;
+}
+select {
+	background: $white;
+	border: solid 1px $grey-light;
+	padding: 5px;
+}
+.in-text,
+.in-pass,
+.in-search,
+select {
+	&:hover,
+	&:focus {
+		border-color: $grey-dark;
+	}
+	&.error {
+		border-color: #fbc2c4;
+		background: #fbe3e4;
+	}
+}
+
+.form {
+	float: left;
+	width: 255px;
+	margin-right: 15px;
+	&.last {
+		margin-right: 0;
+	}
+	label {
+		display: block;
+		margin-bottom: 5px;
+		color: $grey;
+	}
+	select {
+		width: 100%;
+	}
+	.in-text {
+		width: 95%;
+		&.datepicker {
+			width: 86%;
+			background-image: url('../img/icons/date.png');
+			background-repeat: no-repeat;
+			background-position: 7px 5px;
+			display: block;
+			padding-left: 30px;
+		}
+	}
+	li {
+		margin-bottom: 10px;
+		width: 100%;
+		float: left;
+		.choose-date {
+			float: left;
+			width: 125px;
+			label {
+				display: inline-block;
+			}
+			.small {
+				width: 70px;
+			}
+		}
+		.radio {
+			width: 90px;
+			float: left;
+			margin-top: 5px;
+			label {
+				display: inline-block;
+			}
+		}
+		&.inline {
+			label {
+				display: inline-block;
+				float: left;
+				width: 50px;
+			}
+			.radio {
+				margin: 0;
+				label {
+					margin-right: 10px;
+					width: auto;
+				}
+			}
+		}
+	}
+	.btn.green {margin-right: 10px;}
+}
+
+.centered-block {
+	input[type='text'] {
+		background-image: url('../img/icons/user.png');
+		background-repeat: no-repeat;
+		background-position: 7px 5px;
+		display: block;
+		padding-left: 30px;
+		width: 280px;
+	}
+}

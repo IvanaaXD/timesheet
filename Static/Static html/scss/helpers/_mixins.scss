@@ -1,0 +1,36 @@
+//----------  mixins
+//------------------------------------------------------------------------------
+
+@mixin responsive($device) {
+	@if $device == smartphone {
+		@media only screen and (min-width : 320px) and (max-width : 767px) { @content; }
+	}
+
+	@if $device == tablet {
+		@media only screen and (min-width : 768px) and (max-width : 1024px) { @content; }
+	}
+
+	@if $device == desktop {
+		@media only screen and (min-width : 1224px) { @content; }
+	}
+
+	@if $device == retina {
+		@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi) {
+			@content;
+		}
+	}
+}
+
+@mixin input-placeholder {
+	&::-webkit-input-placeholder {
+		@content;
+	}
+
+	&:-moz-placeholder {
+		@content;
+	}
+
+	&:-ms-input-placeholder {
+		@content;
+	}
+}

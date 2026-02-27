@@ -1,0 +1,70 @@
+//----------  buttons
+//------------------------------------------------------------------------------
+@mixin btn {
+	height: 28px;
+	line-height: 26px;
+	color: $white;
+	font-size: 13px;
+	display: inline-block;
+	padding: 0 20px;
+	border: solid 1px $orange-dark;
+
+	&:hover {
+		opacity: 0.9;
+	}
+
+	&.orange {
+		border-color: $orange;
+		background-color: $orange;
+	}
+	&.red {
+		border-color: $red;
+		background-color: $red;
+	}
+	&.green {
+		border-color: $green;
+		background-color: $green;
+	}
+	&.grey {
+		border-color: #ddd;
+		background-color: #ececec;
+		color: $grey-dark;
+	}
+	&.white {
+		background: $white;
+		color: $grey-dark;
+		padding: 0 12px;
+		position: relative;
+		border-color: $white;
+		i {
+			position: absolute;
+			top: 5px;
+		}
+		span {
+			display: inline-block;
+		}
+		&:hover {
+			color: #333;
+			border-color: #333;
+		}
+	}
+	&.nav {
+		height: 38px;
+		line-height: 36px;
+		border: solid 1px $gray-middle;
+		background-color: #eee;
+		color: $grey-dark;
+
+		&:hover,
+		&.active {
+			border-color: #ababab;
+			color: $orange-dark;
+		}
+		&.active {
+			height: 42px;
+			line-height: 42px;
+			margin-top: -4px;
+			background: $white;
+		}
+	}
+}

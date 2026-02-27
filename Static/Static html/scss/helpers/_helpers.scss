@@ -1,0 +1,31 @@
+//----------  helpers
+//------------------------------------------------------------------------------
+
+%clearfix {
+	&::before, &::after {
+	    content: '';
+	    display: table;
+	}
+
+	&::after {
+	    clear: both;
+	}
+}
+.clearfix {
+	@extend %clearfix;
+}
+
+.clear { clear: both; }
+.left { float: left; }
+.right { float: right; }
+
+* {
+	box-sizing: border-box;
+	&::before,
+	&::after {
+		box-sizing: border-box;
+	}
+}
+.flex {
+	display: flex;
+}

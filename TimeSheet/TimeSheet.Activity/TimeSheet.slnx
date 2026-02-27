@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TimeSheet.Application/TimeSheet.Application.csproj" />
+  <Project Path="TimeSheet.Domain/TimeSheet.Domain.csproj" />
+  <Project Path="TimeSheet.Infrastructure/TimeSheet.Infrastructure.csproj" />
+</Solution>

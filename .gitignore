@@ -1,0 +1,6 @@
+$RECYCLE.BIN/
+System Volume Information/
+.vs/
+bin/
+obj/
+node_modules/

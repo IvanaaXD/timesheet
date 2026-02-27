@@ -1,0 +1,69 @@
+//----------  accordion
+//------------------------------------------------------------------------------
+
+.accordion-wrap {
+	width: 100%;
+	float: left;
+	.item {
+		width: 100%;
+		margin-bottom: 10px;
+		float: left;
+		&.open,
+		&:hover {
+			.heading {
+				background: #dadada;
+				span {
+					color: #333;
+				}
+			}
+		}
+		&.open {
+			.heading::after {
+				content: '\00d7';
+			}
+		}
+	}
+	.heading {
+		background: #eee;
+		width: 100%;
+		height: 34px;
+		line-height: 34px;
+		padding: 0 15px;
+		cursor: pointer;
+		position: relative;
+		transition: 0.3s ease;
+		&::after {
+			position: absolute;
+			top: 0;
+			right: 15px;
+			display: block;
+			font-family: 'Material-Design-Iconic-Font';
+			font-style: normal;
+			content: '\00d7';
+			font-size: 18px;
+			color: $grey;
+		}
+		span {
+			color: $grey;
+			font-size: 14px;
+		}
+		i {
+			display: none;
+		}
+	}
+	.details {
+		display: none;
+		float: left;
+		width: 100%;
+		padding: 15px;
+		background: #f7f7f7;
+		.buttons {
+			width: 100%;
+			float: left;
+			margin-bottom: 6px;
+			.inner {
+				float: right;
+			}
+		}
+	}
+}

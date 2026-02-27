@@ -1,0 +1,31 @@
+//----------  pagination
+//------------------------------------------------------------------------------
+
+.pagination {
+	width: 100%;
+	float: left;
+	margin-top: 10px;
+	text-align: center;
+	border-top: 1px dotted $grey-dark;
+	padding-top: 5px;
+	ul {
+		margin: 0 auto;
+		display: inline-block;
+		li {
+			display: inline-block;
+			float: left;
+			border-right: 1px solid $grey-lighter;
+			&.last {
+				border-right: 0;
+			}
+			a {
+				padding: 0 10px;
+				display: block;
+				color: $orange;
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
+	}
+}

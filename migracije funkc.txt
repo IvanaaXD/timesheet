@@ -1,0 +1,7 @@
+
+dotnet ef migrations add InitialCreate --project TimeSheet.Infrastructure --startup-project TimeSheet.WebAPI
+dotnet ef database update --project TimeSheet.Infrastructure --startup-project TimeSheet.WebAPI
+
+
+dotnet ef migrations add IncreaseMemberEmailLength --project TimeSheet.Infrastructure --startup-project TimeSheet.WebAPI
+dotnet ef database update --project TimeSheet.Infrastructure --startup-project TimeSheet.WebAPI

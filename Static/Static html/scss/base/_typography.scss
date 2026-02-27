@@ -1,0 +1,25 @@
+//----------  typography
+//------------------------------------------------------------------------------
+
+h1 {
+	font-size: 32px;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #d2d2d2;
+	margin-bottom: 15px;
+}
+h2 {
+	font-size: 22px;
+	color: $grey-dark;
+	margin-bottom: 15px;
+	border-bottom: 1px dotted $grey-dark;
+}
+.link {
+	color: $orange !important;
+	&:hover {text-decoration: underline; }
+}
+
+.btn {@include btn;}
+.btns-inner {
+	text-align: center;
+}

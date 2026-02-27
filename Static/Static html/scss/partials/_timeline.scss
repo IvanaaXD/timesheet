@@ -1,0 +1,148 @@
+//----------  timeline
+//------------------------------------------------------------------------------
+
+.grey-box-wrap {
+	overflow: hidden;
+	width: 100%;
+	margin-bottom: 15px;
+	background: $grey-lighter;
+	.top {
+		height: 40px;
+		line-height: 40px;
+		padding: 0 10px;
+		overflow: hidden;
+		border-bottom: 1px solid $white;
+		margin-bottom: 10px;
+		box-sizing: border-box;
+		.center {
+			text-align: center;
+			width: 48%;
+			display: block;
+			float: left;
+			color: $grey-darker;
+			font-size: 14px;
+		}
+		.prev,
+		.next {
+			width: 25%;
+			color: $orange-dark;
+			display: inline-block;
+			font-weight: bold;
+			&:hover {
+				text-decoration: underline;
+			}
+			i {
+				display: inline-block;
+				margin-top: 3px;
+			}
+		}
+		.prev {
+			float: left;
+			i {
+				margin-right: 10px;
+			}
+		}
+		.next {
+			float: right;
+			text-align: right;
+			i {
+				margin-left: 10px;
+			}
+		}
+	}
+	.bottom {
+		width: 100%;
+		border-bottom: 1px solid $gray-middle;
+		.days {
+			overflow: hidden;
+			border-right: 1px solid $gray-middle;
+			li {
+				display: table-cell;
+				width: 1%;
+				padding: 5px;
+				border: 1px solid $gray-middle;
+				border-bottom: 0;
+				border-right: 0;
+				background: $white;
+				a {
+					color: $grey;
+					display: block;
+					transition: 0.3s ease;
+					span {
+						display: block;
+						clear: both;
+						text-transform: uppercase;
+						font-weight: 600;
+						&.show-on-mob {
+							display: none;
+						}
+					}
+					b {
+						float: left;
+						font-size: 11px;
+						font-weight: normal;
+					}
+					i {
+						float: right;
+						font-size: 11px;
+						font-style: normal;
+					}
+				}
+				&.last {
+					margin: 0;
+				}
+				&.active,
+				&:hover {
+					a {
+						color: $white;
+					}
+				}
+				&.active,
+				&:hover {
+					background: $orange;
+				}
+			}
+		}
+	}
+}
+
+//----------  total hours
+//------------------------------------------------------------------------------
+
+.total {
+	width: 100%;
+	overflow: hidden;
+	background: #ececec;
+	height: 40px;
+	line-height: 40px;
+	padding: 0 10px;
+	&.mb {
+		margin-bottom: 15px;
+	}
+	span {
+		float: right;
+		font-weight: 700;
+		font-size: 13px;
+		em {
+			color: $orange;
+			font-style: normal;
+		}
+	}
+	a {
+		float: left;
+		color: $orange;
+		display: inline-block;
+		font-size: 13px;
+		font-weight: 600;
+		transition: 0.3s ease;
+		i {
+			margin-right: 10px;
+			font-size: 16px;
+			position: relative;
+			top: 2px;
+		}
+		&:hover {
+			color: $grey;
+		}
+	}
+}

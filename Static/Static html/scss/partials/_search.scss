@@ -1,0 +1,54 @@
+//----------  search
+//------------------------------------------------------------------------------
+
+.search-page {
+	float: right;
+}
+
+.alpha {
+	width: 100%;
+	float: left;
+	ul {
+		margin-left: 8px;
+		overflow: hidden;
+	}
+	li {
+		float: left;
+		margin: 0 5px 15px 0;
+		&.last {
+			margin-right: 0;
+		}
+		&.active,
+		&:hover {
+			a {
+				color: $white;
+				background: $orange;
+				border-color: $orange;
+			}
+		}
+		&.disabled {
+			a {
+				color: $grey-light;
+				background: $grey-lighter;
+				border-color: $grey-lighter;
+				cursor: default;
+			}
+			&:hover {
+				@extend .disabled;
+			}
+		}
+	}
+	a {
+		text-transform: uppercase;
+		background: #eee;
+		border: 1px solid #bdbdbd;
+		display: block;
+		width: 24px;
+		height: 24px;
+		text-align: center;
+		font-size: 14px;
+		line-height: 24px;
+		font-weight: bold;
+		color: $orange;
+	}
+}

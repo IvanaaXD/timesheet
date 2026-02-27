@@ -1,0 +1,131 @@
+//----------  tables
+//------------------------------------------------------------------------------
+
+.default-table {
+	width: 100%;
+	border-bottom: 1px solid #999;
+	margin-bottom: 15px;
+	tr {
+		td {
+			padding: 10px 5px 0;
+			color: $grey;
+			&:first-child {
+				padding-left: 0;
+			}
+			&:last-child {
+				padding-right: 0;
+			}
+			&.small {
+				width: 35px;
+			}
+			select {
+				width: 100%;
+			}
+			input.medium {
+				width: 100%;
+			}
+		}
+		th {
+			text-align: left;
+			border-top: 1px solid #999;
+			border-bottom: 1px solid #999;
+			padding: 10px 0;
+			color: $grey;
+			font-weight: bold;
+			em {
+				color: $orange-dark;
+			}
+			&.small {
+				width: 55px;
+			}
+		}
+		&:last-child {
+			td {
+				padding-bottom: 10px;
+			}
+		}
+	}
+}
+.month-table {
+	width: 100%;
+	float: left;
+	margin-bottom: 10px;
+	tr {
+		&.mobile-head {
+			display: none;
+		}
+		th {
+			text-transform: uppercase;
+			span {
+				display: inline-block;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
+			width: 100%;
+			}
+		}
+		td {
+			width: 14%;
+			border: 1px solid $gray-middle;
+			.date {
+				width: 100%;
+				padding: 5px;
+				box-sizing: border-box;
+				color: $grey-darker;
+			}
+			&.previous,
+			&.next {
+				.date {
+					color: $text;
+				}
+			}
+			.hours {
+				width: 100%;
+				padding: 10px 5px;
+				box-sizing: border-box;
+				a {
+					color: $grey;
+					font-weight: bold;
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+			&.positive {
+				.hours {
+					background-color: $positive-light;
+				}
+			}
+			&.negative {
+				.hours {
+					background-color: $negative-light;
+				}
+			}
+			&.disable {
+				background: $grey-lighter;
+				.date {
+					color: $gray-middle;
+				}
+				.hours {
+					a {
+						color: $gray-middle;
+						cursor: default;
+						&:hover {
+							text-decoration: none;
+						}
+					}
+				}
+			}
+		}
+	}
+	@include responsive(smartphone) {
+		tr {
+			&.head {
+				display: none;
+			}
+			&.mobile-head {
+				display: table-row;
+			}
+		}
+	}
+}
