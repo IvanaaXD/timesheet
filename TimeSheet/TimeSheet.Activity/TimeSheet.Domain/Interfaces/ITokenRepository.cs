@@ -9,8 +9,8 @@ namespace TimeSheet.Domain.Interfaces
     public interface ITokenRepository
     {
         Task<RefreshToken> FindRefreshToken(Guid memberId);
-        Task<RefreshToken> GenerateRefreshToken();
+        Task<RefreshToken> FindRefreshTokenByTokenString(string tokenString);
         Task RevokeRefreshToken(RefreshToken refreshToken);
-        Task SaveRefreshToken(Guid memberId, RefreshToken refreshToken);
+        Task SaveRefreshToken(RefreshToken refreshToken);
     }
 }

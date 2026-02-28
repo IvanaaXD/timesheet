@@ -63,12 +63,12 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("paged")]
-        public async Task<IActionResult> GetAllMembersPaged()
-        {
-            var result = await _memberService.GetAllMembersPagedAsync();
-            return Ok(result);
-        }
+        //[HttpGet("paged")]
+        //public async Task<IActionResult> GetAllMembersPaged()
+        //{
+        //    var result = await _memberService.GetAllMembersPagedAsync();
+        //    return Ok(result);
+        //}
 
         [HttpPost]
         public async Task<IActionResult> CreateMember([FromBody] MemberRequestDTO MemberRequestDTO)

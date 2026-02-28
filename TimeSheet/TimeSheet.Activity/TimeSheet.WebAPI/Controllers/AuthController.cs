@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TimeSheet.Application.DTOs.Auth;
 using TimeSheet.Application.Abstractions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TimeSheet.WebAPI.Controllers
 {
@@ -24,8 +25,8 @@ namespace TimeSheet.WebAPI.Controllers
             if (result.StatusCode == 401)
             {
                 return Unauthorized(new { message = "Incorrect credentials." });
-            } 
-            else if (result.StatusCode == 404) 
+            }
+            else if (result.StatusCode == 404)
             {
                 return NotFound(new { message = "Username does not exist." });
             }
@@ -33,6 +34,13 @@ namespace TimeSheet.WebAPI.Controllers
             {
                 return Ok(result);
             }
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        {
+            await _identityService.LogoutAsync(request);
+            return NoContent();
         }
     }
 }

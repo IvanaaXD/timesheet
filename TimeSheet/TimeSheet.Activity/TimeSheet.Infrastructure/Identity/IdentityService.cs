@@ -6,7 +6,6 @@ using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 
 using BCrypt.Net;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,6 +15,7 @@ using TimeSheet.Application.DTOs.Auth;
 using TimeSheet.Application.Abstractions;
 using System.Security.Cryptography;
 using TimeSheet.Domain.Entities.Enums;
+using TimeSheet.Domain.Common.Models;
 
 namespace TimeSheet.Infrastructure.Identity
 {
@@ -25,9 +25,10 @@ namespace TimeSheet.Infrastructure.Identity
         private readonly ITokenRepository _tokenRepository;
         private readonly IConfiguration _configuration;
 
-        public IdentityService(IMemberRepository memberRepository, IConfiguration configuration)
+        public IdentityService(IMemberRepository memberRepository, ITokenRepository tokenRepository, IConfiguration configuration)
         {
             _memberRepository = memberRepository;
+            _tokenRepository = tokenRepository;
             _configuration = configuration;
         }
 
@@ -54,7 +55,7 @@ namespace TimeSheet.Infrastructure.Identity
             }
 
             var accessToken = GenerateAccessToken(member.Id, member.Username, member.Role);
-            var refreshToken = GenerateRefreshToken(member);
+            var refreshToken = GenerateRefreshToken();
 
             return new AuthResult
             {
@@ -67,6 +68,18 @@ namespace TimeSheet.Infrastructure.Identity
                     RefreshToken = refreshToken
                 }
             };
+        }
+
+        public async Task LogoutAsync(LogoutRequest request)
+        {
+            var refreshToken = await _tokenRepository.FindRefreshTokenByTokenString(request.TokenString);
+
+            if (refreshToken == null)
+            {
+                throw new UnauthorizedAccessException("Invalid refresh token.");
+            }
+
+            await _tokenRepository.RevokeRefreshToken(refreshToken);
         }
 
         private string GenerateAccessToken(Guid id, string username, MemberRole role)
@@ -109,23 +122,38 @@ namespace TimeSheet.Infrastructure.Identity
             var role = principal.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
             var username = principal.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
 
-            var savedRefreshedToken = _tokenRepository.GetRefreshToken(userId);
+            var memberGuid = Guid.Parse(userId!);
+            var savedRefreshedToken = await _tokenRepository.FindRefreshToken(memberGuid);
             if (savedRefreshedToken == null || savedRefreshedToken.ExpiryDate <= DateTime.UtcNow)
             {
-               return Unauthorized("Invalid refresh token.")
+                throw new UnauthorizedAccessException("Invalid refresh token.");
             }
 
-            var newAccessToken = GenerateAccessToken(userId, username, role);
-            var newRefreshToken = GenerateRefreshToken();
+            var newAccessToken = GenerateAccessToken(
+                Guid.Parse(userId!),
+                username!,
+                Enum.Parse<MemberRole>(role!)
+            );
+            var newRefreshToken = new RefreshToken
+            {
+                TokenString = GenerateRefreshToken(),
+                MemberId = Guid.Parse(userId!),
+                ExpiryDate = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false
+            };
+            await _tokenRepository.SaveRefreshToken(newRefreshToken);
 
             await _tokenRepository.RevokeRefreshToken(savedRefreshedToken);
-            await _tokenRepository.SaveRefreshToken(userId, newRefreshToken);
+            newRefreshToken.MemberId = Guid.Parse(userId!);
+            await _tokenRepository.SaveRefreshToken(newRefreshToken);
 
-            return 
+            return newAccessToken;
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)
         {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+
             var key = Encoding.UTF8.GetBytes(jwtSettings["Secret"]);
             var tokenValidationParameters = new TokenValidationParameters
             {

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using TimeSheet.Domain.Entities;
+using TimeSheet.Domain.Common.Models;
 
 namespace TimeSheet.Infrastructure.Data
 {
@@ -14,6 +15,7 @@ namespace TimeSheet.Infrastructure.Data
         public DbSet<Member> Members { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectLead> ProjectLeads { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

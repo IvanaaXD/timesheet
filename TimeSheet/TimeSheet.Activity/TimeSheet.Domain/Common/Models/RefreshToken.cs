@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using TimeSheet.Domain.Entities;
 
 namespace TimeSheet.Domain.Common.Models
 {
     public class RefreshToken
     {
         public Guid id { get; set; }
-        public string RefreshToken { get; set; }
+        public string TokenString { get; set; }
         public DateTime ExpiryDate { get; set; }
-        public bool IsRevoced { get; set; }
+        public bool IsRevoked { get; set; }
 
         // Relationships
 
@@ -18,11 +19,11 @@ namespace TimeSheet.Domain.Common.Models
         // Contructors
 
         public RefreshToken() { }
-        public RefreshToken(string refreshToken, DateTime expiresAt, bool isRevoced)
+        public RefreshToken(string tokenString, DateTime expiresAt, bool isRevoked)
         {
-            RefreshToken = refreshToken;
+            TokenString = tokenString;
             ExpiryDate = expiresAt;
-            IsRevoced = isRevoced;
+            IsRevoked = isRevoked;
         }
     }
 }

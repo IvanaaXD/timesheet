@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TimeSheet.Infrastructure.Data;
@@ -11,9 +12,11 @@ using TimeSheet.Infrastructure.Data;
 namespace TimeSheet.Infrastructure.Migrations
 {
     [DbContext(typeof(TimeSheetDbContext))]
-    partial class TimeSheetDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227233955_AddRefreshToken")]
+    partial class AddRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

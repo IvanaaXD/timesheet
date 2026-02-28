@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Infrastructure.Data;
+using TimeSheet.Domain.Common.Models;
 
 namespace TimeSheet.Infrastructure.Repositories
 {
@@ -17,24 +18,30 @@ namespace TimeSheet.Infrastructure.Repositories
             _context = context;
         }
 
-        public Task<RefreshToken> FindRefreshToken(Guid memberId)
+        public async Task<RefreshToken?> FindRefreshToken(Guid memberId)
         {
-
+            return await _context.RefreshTokens
+                .Include(x => x.Member)
+                .FirstOrDefaultAsync(x => x.Member.Id == memberId && !x.IsRevoked);
         }
 
-        public Task<RefreshToken> GenerateRefreshToken()
+        public async Task<RefreshToken?> FindRefreshTokenByTokenString(string tokenString)
         {
-
+            return await _context.RefreshTokens
+                .Include(x => x.Member)
+                .FirstOrDefaultAsync(x => x.TokenString == tokenString && !x.IsRevoked);
         }
 
-        public Task RevokeRefreshToken(RefreshToken refreshToken)
+        public async Task RevokeRefreshToken(RefreshToken refreshToken)
         {
-
+            refreshToken.IsRevoked = true;
+            await _context.SaveChangesAsync();
         }
         
-        public Task SaveRefreshToken(Guid memberId, RefreshToken refreshToken)
+        public async Task SaveRefreshToken(RefreshToken refreshToken)
         {
-
+            _context.RefreshTokens.Add(refreshToken);
+            await _context.SaveChangesAsync();
         }
     }
 }

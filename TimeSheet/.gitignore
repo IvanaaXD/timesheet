@@ -1,1 +1,37 @@
-N/`nSystem Volume Information/`n.vs/`nbin/`nobj/`nnode_modules/"
+# .NET / C# standard
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Rider caches
+.idea/
+*.iml
+out/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# dotnet watch
+dotnet-watch.json

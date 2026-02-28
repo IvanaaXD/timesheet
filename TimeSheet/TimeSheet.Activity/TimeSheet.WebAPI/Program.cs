@@ -31,6 +31,7 @@ builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectLeadRepository, ProjectLeadRepository>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
