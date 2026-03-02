@@ -7,6 +7,7 @@ using TimeSheet.Application.DTOs.Country;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
+using TimeSheet.Application.Exceptions;
 
 namespace TimeSheet.Application.Services
 {
@@ -24,7 +25,7 @@ namespace TimeSheet.Application.Services
         public async Task<CountryDTO> GetCountryByIdAsync(Guid id)
         {
             var country = await _countryRepository.FindCountryByIdAsync(id);
-            if (country == null) throw new KeyNotFoundException($"Country with ID {id} not found.");
+            if (country == null) throw new NotFoundException($"Country with ID {id} not found.");
 
             return _mapper.Map<CountryDTO>(country);
         }
@@ -32,7 +33,7 @@ namespace TimeSheet.Application.Services
         public async Task<CountryDTO> GetCountryByNameAsync(string name)
         {
             var country = await _countryRepository.FindCountryByNameAsync(name);
-            if (country == null) throw new KeyNotFoundException($"Country with name {name} not found.");
+            if (country == null) throw new NotFoundException($"Country with name {name} not found.");
 
             return _mapper.Map<CountryDTO>(country);
         }
@@ -55,7 +56,7 @@ namespace TimeSheet.Application.Services
         public async Task<CountryDTO> UpdateCountryAsync(Guid id, CountryRequestDTO countryRequestDTO)
         {
             var existingCountry = await _countryRepository.FindCountryByIdAsync(id);
-            if (existingCountry == null) throw new KeyNotFoundException($"Country with ID {id} not found.");
+            if (existingCountry == null) throw new NotFoundException($"Country with ID {id} not found.");
 
             _mapper.Map(countryRequestDTO, existingCountry);
 

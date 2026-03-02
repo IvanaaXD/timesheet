@@ -1,0 +1,3 @@
+Role => kad je neko admin a kad worker, da se razgranice funkcionalnosti
+Za projekte i membere - podrazumijevano da imaju status INACTIVE ako drugi nije naveden pri kreiranju
+Print report, create pdf, export to excel - idu na front ili back?

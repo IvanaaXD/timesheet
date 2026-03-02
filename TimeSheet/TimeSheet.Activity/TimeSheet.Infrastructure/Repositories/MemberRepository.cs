@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Infrastructure.Data;
+using TimeSheet.Domain.Common.Models; 
+using TimeSheet.Domain.Entities;     
 
 namespace TimeSheet.Infrastructure.Repositories
 {
@@ -64,6 +66,25 @@ namespace TimeSheet.Infrastructure.Repositories
         {
             _context.Members.Remove(member);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<PagedList<Member>> FindAllMembersPagedAsync(
+            int pageNumber,
+            int pageSize,
+            string order)
+        {
+            var query = _context.Members.AsNoTracking().AsQueryable();
+
+            query = order.ToLower() == "desc"
+                ? query.OrderByDescending(c => c.Name)
+                : query.OrderBy(c => c.Name);
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize)
+                                   .Take(pageSize)
+                                   .ToListAsync();
+
+            return new PagedList<Member>(items, totalCount, pageNumber, pageSize);
         }
     }
 }

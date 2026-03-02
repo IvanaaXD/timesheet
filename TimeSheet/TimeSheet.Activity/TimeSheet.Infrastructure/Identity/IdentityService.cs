@@ -16,6 +16,7 @@ using TimeSheet.Application.Abstractions;
 using System.Security.Cryptography;
 using TimeSheet.Domain.Entities.Enums;
 using TimeSheet.Domain.Common.Models;
+using TimeSheet.Infrastructure.Repositories;
 
 namespace TimeSheet.Infrastructure.Identity
 {
@@ -55,7 +56,15 @@ namespace TimeSheet.Infrastructure.Identity
             }
 
             var accessToken = GenerateAccessToken(member.Id, member.Username, member.Role);
-            var refreshToken = GenerateRefreshToken();
+
+            var refreshToken = new RefreshToken
+            {
+                TokenString = GenerateRefreshToken(),
+                MemberId = member.Id,
+                ExpiryDate = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false
+            };
+            await _tokenRepository.SaveRefreshToken(refreshToken);
 
             return new AuthResult
             {
@@ -65,7 +74,7 @@ namespace TimeSheet.Infrastructure.Identity
                     Id = member.Id,
                     Username = member.Username,
                     AccessToken = accessToken,
-                    RefreshToken = refreshToken
+                    RefreshToken = refreshToken.TokenString
                 }
             };
         }

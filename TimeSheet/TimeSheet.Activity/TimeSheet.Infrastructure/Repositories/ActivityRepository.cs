@@ -54,8 +54,8 @@ namespace TimeSheet.Infrastructure.Repositories
             Guid? clientId,
             Guid? projectId,
             Guid? categoryId,
-            DateTime? startDate,
-            DateTime? endDate)
+            DateOnly? startDate,
+            DateOnly? endDate)
         {
             IQueryable<Activity> query = _context.Activities;
 
@@ -72,10 +72,10 @@ namespace TimeSheet.Infrastructure.Repositories
                 query = query.Where(a => a.Project.ClientId == clientId.Value);
 
             if (startDate.HasValue)
-                query = query.Where(a => a.Date >= DateOnly.FromDateTime(startDate.Value));
+                query = query.Where(a => a.Date >= startDate.Value);
 
             if (endDate.HasValue)
-                query = query.Where(a => a.Date <= DateOnly.FromDateTime(endDate.Value));
+                query = query.Where(a => a.Date <= endDate.Value);
 
             return await query
                 .Include(a => a.Project)

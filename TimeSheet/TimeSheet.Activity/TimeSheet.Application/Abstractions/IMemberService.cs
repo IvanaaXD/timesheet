@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeSheet.Application.DTOs.Member;
+using TimeSheet.Application.Common.DTOs;
+using TimeSheet.Domain.Common.Models; // Gde se nalazi PagedList
+using TimeSheet.Domain.Entities;      // Gde se nalazi Member
 
 namespace TimeSheet.Application.Abstractions
 {
@@ -11,6 +14,7 @@ namespace TimeSheet.Application.Abstractions
         Task<MemberDTO> GetMemberByUsernameAsync(string username);
         Task<MemberDTO> GetMemberByEmailAsync(string email);
         Task<IEnumerable<MemberDTO>> GetAllMembersAsync();
+        Task<PagedList<MemberDTO>> GetAllMembersPagedAsync(PagedListDTO pagedListDTO);
         Task<MemberDTO> CreateMemberAsync(MemberRequestDTO request);
         Task<MemberDTO> UpdateMemberAsync(Guid id, MemberRequestDTO request);
         Task<MemberDTO> UpdateMemberPasswordAsync(Guid id, MemberRequestDTO request);

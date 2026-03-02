@@ -2,9 +2,11 @@
 using System.Threading.Tasks;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Category;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TimeSheet.WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CategoryController : ControllerBase
@@ -16,32 +18,23 @@ namespace TimeSheet.WebAPI.Controllers
             _categoryService = categoryService;
         }
 
+        [Authorize]
         [HttpGet("id/{id}")]
         public async Task<IActionResult> GetCategoryById(Guid id)
         {
             var result = await _categoryService.GetCategoryByIdAsync(id);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Category with ID {id} not found." });
-            }
-
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetCategoryByName(string name)
         {
             var result = await _categoryService.GetCategoryByNameAsync(name);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Category with ID {name} not found." });
-            }
-
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {
@@ -49,6 +42,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryRequestDTO categoryRequestDTO)
         {
@@ -56,6 +50,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryRequestDTO categoryRequestDTO, Guid id)
         {

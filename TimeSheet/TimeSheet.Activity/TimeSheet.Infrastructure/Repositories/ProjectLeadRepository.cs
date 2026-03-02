@@ -39,9 +39,11 @@ namespace TimeSheet.Infrastructure.Repositories
 
         public async Task<IEnumerable<Project>> FindProjectsByLeadAsync(Guid memberId)
         {
-            return await _context.ProjectLeads
-                .Where(pl => pl.MemberId == memberId)
-                .Select(pl => pl.Project) 
+            return await _context.Projects
+                .Include(p => p.Client)       
+                .Include(p => p.CurrentLead)  
+                .Where(p => _context.ProjectLeads
+                    .Any(pl => pl.ProjectId == p.Id && pl.MemberId == memberId))
                 .ToListAsync();
         }
 

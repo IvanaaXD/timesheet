@@ -11,7 +11,7 @@ namespace TimeSheet.Domain.Entities
         public string Email { get; set; }
         public string Password { get; set; } = string.Empty;
         public decimal HoursPerWeek { get; set; }
-        public MemberStatus Status { get; set; }
+        public MemberStatus Status { get; set; } = MemberStatus.INACTIVE;
         public MemberRole Role { get; set; }
         public Boolean IsDeleted { get; set; } = false;
 

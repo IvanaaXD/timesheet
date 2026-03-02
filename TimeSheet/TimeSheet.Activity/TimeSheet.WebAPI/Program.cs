@@ -1,13 +1,20 @@
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Infrastructure.Data;
 using TimeSheet.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
 using TimeSheet.Application.Services;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Infrastructure.Email;
 using TimeSheet.Infrastructure.Identity;
 using TimeSheet.Application.Common.Models;
 using AutoMapper;
+using TimeSheet.Infrastructure.Middleware;
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,11 +25,32 @@ var connectionString = builder.Configuration.GetConnectionString("PostgresConnec
 builder.Services.AddDbContext<TimeSheetDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddAutoMapper(typeof(ICategoryService).Assembly);
-builder.Services.AddAutoMapper(typeof(ICountryService).Assembly);
-builder.Services.AddAutoMapper(typeof(IClientService).Assembly);
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["Secret"];
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+    };
+});
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddAutoMapper(typeof(IMemberService).Assembly);
-builder.Services.AddAutoMapper(typeof(IProjectService).Assembly);
 
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -57,6 +85,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

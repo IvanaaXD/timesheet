@@ -8,6 +8,7 @@ using TimeSheet.Application.DTOs.Project;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
+using TimeSheet.Application.Exceptions;
 
 namespace TimeSheet.Application.Services
 {
@@ -29,10 +30,10 @@ namespace TimeSheet.Application.Services
         public async Task AssignLeadAsync(Guid projectId, Guid memberId)
         {
             var project = await _projectRepository.FindProjectByIdAsync(projectId);
-            if (project == null) throw new KeyNotFoundException($"Project with ID {projectId} not found.");
+            if (project == null) throw new NotFoundException($"Project with ID {projectId} not found.");
 
             var member = await _memberRepository.FindMemberByIdAsync(memberId);
-            if (member == null) throw new KeyNotFoundException($"Member with ID {memberId} not found.");
+            if (member == null) throw new NotFoundException($"Member with ID {memberId} not found.");
 
             var isLead = await _projectLeadRepository.IsMemberLeadOfProjectAsync(memberId, projectId);
             if (isLead) return;
@@ -43,13 +44,13 @@ namespace TimeSheet.Application.Services
         public async Task RemoveLeadAsync(Guid projectId, Guid memberId)
         {
             var project = await _projectRepository.FindProjectByIdAsync(projectId);
-            if (project == null) throw new KeyNotFoundException($"Project with ID {projectId} not found.");
+            if (project == null) throw new NotFoundException($"Project with ID {projectId} not found.");
 
             var member = await _memberRepository.FindMemberByIdAsync(memberId);
-            if (member == null) throw new KeyNotFoundException($"Member with ID {memberId} not found.");
+            if (member == null) throw new NotFoundException($"Member with ID {memberId} not found.");
 
             var isLead = await _projectLeadRepository.IsMemberLeadOfProjectAsync(memberId, projectId);
-            if (!isLead) throw new KeyNotFoundException($"Member with ID {memberId} does not lead the project with ID {projectId}");
+            if (!isLead) throw new NotFoundException($"Member with ID {memberId} does not lead the project with ID {projectId}");
 
             await _projectLeadRepository.RemoveLeadAsync(projectId, memberId);
         }
@@ -69,10 +70,10 @@ namespace TimeSheet.Application.Services
         public async Task<bool> IsMemberLeadOfProjectAsync(Guid memberId, Guid projectId)
         {
             var project = await _projectRepository.FindProjectByIdAsync(projectId);
-            if (project == null) throw new KeyNotFoundException($"Project with ID {projectId} not found.");
+            if (project == null) throw new NotFoundException($"Project with ID {projectId} not found.");
 
             var member = await _memberRepository.FindMemberByIdAsync(memberId);
-            if (member == null) throw new KeyNotFoundException($"Member with ID {memberId} not found.");
+            if (member == null) throw new NotFoundException($"Member with ID {memberId} not found.");
 
             return await _projectLeadRepository.IsMemberLeadOfProjectAsync(memberId, projectId);
         }

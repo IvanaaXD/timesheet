@@ -9,6 +9,7 @@ using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Domain.Common.Models;
 using TimeSheet.Application.Common.DTOs;
+using TimeSheet.Application.Exceptions;
 
 namespace TimeSheet.Application.Services
 {
@@ -28,7 +29,7 @@ namespace TimeSheet.Application.Services
         public async Task<ProjectDTO> GetProjectByIdAsync(Guid id)
         {
             var project = await _projectRepository.FindProjectByIdAsync(id);
-            if (project == null) throw new KeyNotFoundException($"Project with ID {id} not found.");
+            if (project == null) throw new NotFoundException($"Project with ID {id} not found.");
 
             return _mapper.Map<ProjectDTO>(project);
         }
@@ -64,7 +65,7 @@ namespace TimeSheet.Application.Services
         public async Task<ProjectDTO> UpdateProjectAsync(Guid id, ProjectRequestDTO projectRequestDTO)
         {
             var existingProject = await _projectRepository.FindProjectByIdAsync(id);
-            if (existingProject == null) throw new KeyNotFoundException($"Project with ID {id} not found.");
+            if (existingProject == null) throw new NotFoundException($"Project with ID {id} not found.");
 
             _mapper.Map(projectRequestDTO, existingProject);
             await _projectRepository.UpdateProjectAsync(existingProject);
@@ -76,7 +77,7 @@ namespace TimeSheet.Application.Services
         public async Task DeleteProjectAsync(Guid id)
         {
             var existingProject = await _projectRepository.FindProjectByIdAsync(id);
-            if (existingProject == null) throw new KeyNotFoundException($"Project with ID {id} not found.");
+            if (existingProject == null) throw new NotFoundException($"Project with ID {id} not found.");
 
             await _projectRepository.DeleteProjectAsync(existingProject);
         }

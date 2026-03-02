@@ -7,6 +7,9 @@ using TimeSheet.Application.DTOs.Member;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
+using TimeSheet.Application.Common.DTOs;
+using TimeSheet.Domain.Common.Models;
+using TimeSheet.Application.Exceptions;
 
 namespace TimeSheet.Application.Services
 {
@@ -40,7 +43,7 @@ namespace TimeSheet.Application.Services
         public async Task<MemberDTO> GetMemberByIdAsync(Guid id)
         {
             var member = await _memberRepository.FindMemberByIdAsync(id);
-            if (member == null) throw new KeyNotFoundException($"Member with ID {id} not found.");
+            if (member == null) throw new NotFoundException($"Member with ID {id} not found.");
 
             return _mapper.Map<MemberDTO>(member);
         }
@@ -48,7 +51,7 @@ namespace TimeSheet.Application.Services
         public async Task<MemberDTO> GetMemberByUsernameAsync(string username)
         {
             var member = await _memberRepository.FindMemberByUsernameAsync(username);
-            if (member == null) throw new KeyNotFoundException($"Member with ID {username} not found.");
+            if (member == null) throw new NotFoundException($"Member with username {username} not found.");
 
             return _mapper.Map<MemberDTO>(member);
         }
@@ -56,7 +59,7 @@ namespace TimeSheet.Application.Services
         public async Task<MemberDTO> GetMemberByEmailAsync(string email)
         {
             var member = await _memberRepository.FindMemberByEmailAsync(email);
-            if (member == null) throw new KeyNotFoundException($"Member with ID {email} not found.");
+            if (member == null) throw new NotFoundException($"Member with email {email} not found.");
 
             return _mapper.Map<MemberDTO>(member);
         }
@@ -65,6 +68,16 @@ namespace TimeSheet.Application.Services
         {
             var members = await _memberRepository.FindAllMembersAsync();
             return _mapper.Map<IEnumerable<MemberDTO>>(members);
+        }
+
+        public async Task<PagedList<MemberDTO>> GetAllMembersPagedAsync(PagedListDTO pagedListDTO)
+        {
+            var pagedMembers = await _memberRepository.FindAllMembersPagedAsync(
+                pagedListDTO.PageNumber, pagedListDTO.PageSize, pagedListDTO.Order);
+
+            var dtos = _mapper.Map<PagedList<MemberDTO>>(pagedMembers);
+
+            return dtos;
         }
 
         public async Task<MemberDTO> CreateMemberAsync(MemberRequestDTO memberRequestDTO)
@@ -85,7 +98,7 @@ namespace TimeSheet.Application.Services
         public async Task<MemberDTO> UpdateMemberAsync(Guid id, MemberRequestDTO memberRequestDTO)
         {
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
-            if (existingMember == null) throw new KeyNotFoundException($"Member with ID {id} not found.");
+            if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
 
             _mapper.Map(memberRequestDTO, existingMember);
             await _memberRepository.UpdateMemberAsync(existingMember);
@@ -97,7 +110,7 @@ namespace TimeSheet.Application.Services
         public async Task<MemberDTO> UpdateMemberPasswordAsync(Guid id, MemberRequestDTO memberRequestDTO)
         {
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
-            if (existingMember == null) throw new KeyNotFoundException($"Member with ID {id} not found.");
+            if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
 
             string plainPassword = GenerateRandomPassword(10);
             existingMember.Password = _passwordHasher.HashPassword(plainPassword);
@@ -113,7 +126,7 @@ namespace TimeSheet.Application.Services
         public async Task DeleteMemberAsync(Guid id)
         {
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
-            if (existingMember == null) throw new KeyNotFoundException($"Member with ID {id} not found.");
+            if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
 
             await _memberRepository.DeleteMemberAsync(existingMember);
         }

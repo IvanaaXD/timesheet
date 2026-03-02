@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Client;
 using TimeSheet.Application.Common.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TimeSheet.WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ClientController : ControllerBase
@@ -17,32 +19,23 @@ namespace TimeSheet.WebAPI.Controllers
             _clientService = clientService;
         }
 
+        [Authorize]
         [HttpGet("id/{id}")]
         public async Task<IActionResult> GetClientById(Guid id)
         {
             var result = await _clientService.GetClientByIdAsync(id);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Client with ID {id} not found." });
-            }
-
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetClientByName(string name)
         {
             var result = await _clientService.GetClientByNameAsync(name);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Client with name {name} not found." });
-            }
-
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllCountries()
         {
@@ -50,6 +43,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("paged")]
         public async Task<IActionResult> GetPagedClients([FromQuery] PagedListDTO pagedListDTO)
         {
@@ -57,6 +51,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateClient([FromBody] ClientRequestDTO clientRequestDTO)
         {
@@ -64,6 +59,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateClient([FromBody] ClientRequestDTO clientRequestDTO, Guid id)
         {
@@ -71,18 +67,12 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("delete/{id}")]
+        [Authorize]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClient(Guid id) 
         {
-            try
-            {
-                await _clientService.DeleteClientAsync(id);
-                return NoContent(); 
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _clientService.DeleteClientAsync(id);
+            return NoContent();
         }
     }
 }

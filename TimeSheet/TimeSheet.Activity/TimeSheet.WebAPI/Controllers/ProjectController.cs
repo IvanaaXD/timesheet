@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Project;
 using TimeSheet.Application.Common.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TimeSheet.WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProjectController : ControllerBase
@@ -17,19 +19,15 @@ namespace TimeSheet.WebAPI.Controllers
             _projectService = projectService;
         }
 
+        [Authorize]
         [HttpGet("id/{id}")]
         public async Task<IActionResult> GetProjectById(Guid id)
         {
             var result = await _projectService.GetProjectByIdAsync(id);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Project with ID {id} not found." });
-            }
-
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllProjects()
         {
@@ -37,6 +35,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("paged")]
         public async Task<IActionResult> GetPagedProjects([FromQuery] PagedListDTO pagedListDTO)
         {
@@ -44,6 +43,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] ProjectRequestDTO ProjectRequestDTO)
         {
@@ -51,6 +51,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProject([FromBody] ProjectRequestDTO ProjectRequestDTO, Guid id)
         {
@@ -58,18 +59,12 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("delete/{id}")]
+        [Authorize]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProject(Guid id)
         {
-            try
-            {
-                await _projectService.DeleteProjectAsync(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _projectService.DeleteProjectAsync(id);
+            return NoContent();
         }
     }
 }

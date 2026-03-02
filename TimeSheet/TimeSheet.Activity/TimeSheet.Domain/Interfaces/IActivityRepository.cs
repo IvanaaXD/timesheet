@@ -16,7 +16,7 @@ namespace TimeSheet.Domain.Interfaces
             Guid? clientId,
             Guid? projectId,
             Guid? categoryId,
-            DateTime? startDate,
-            DateTime? endDate);
+            DateOnly? startDate,
+            DateOnly? endDate);
     }
 }

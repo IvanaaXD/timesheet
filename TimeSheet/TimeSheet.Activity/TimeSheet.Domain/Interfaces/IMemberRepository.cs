@@ -1,5 +1,6 @@
 ﻿using System;
 using TimeSheet.Domain.Entities;
+using TimeSheet.Domain.Common.Models;
 
 namespace TimeSheet.Domain.Interfaces
 {
@@ -13,6 +14,9 @@ namespace TimeSheet.Domain.Interfaces
         Task UpdateMemberAsync(Member member);
         Task UpdateMemberPasswordAsync(Member member);
         Task DeleteMemberAsync(Member member);
-        // paginacija
+        Task<PagedList<Member>> FindAllMembersPagedAsync(
+           int pageNumber,
+           int pageSize,
+           string order);
     }
 }

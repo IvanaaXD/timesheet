@@ -26,8 +26,18 @@ namespace TimeSheet.Infrastructure.Identity
         {
             get
             {
-                var claim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
-                return claim != null ? Guid.Parse(claim.Value) : Guid.Empty;
+                var user = _httpContextAccessor.HttpContext?.User;
+
+                var claim = user?.FindFirst(ClaimTypes.NameIdentifier) 
+                            ?? user?.FindFirst("nameid")               
+                            ?? user?.FindFirst("sub");                 
+
+                if (claim == null || string.IsNullOrEmpty(claim.Value))
+                {
+                    return Guid.Empty;
+                }
+
+                return Guid.Parse(claim.Value);
             }
         }
     }

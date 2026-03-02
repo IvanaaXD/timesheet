@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Member;
 using TimeSheet.Application.Common.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TimeSheet.WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class MemberController : ControllerBase
@@ -17,6 +19,7 @@ namespace TimeSheet.WebAPI.Controllers
             _memberService = MemberService;
         }
 
+        [Authorize]
         [HttpGet("id/{id}")]
         public async Task<IActionResult> GetMemberById(Guid id)
         {
@@ -30,6 +33,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("username/{username}")]
         public async Task<IActionResult> GetMemberByUsername(string username)
         {
@@ -43,6 +47,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("email/{email}")]
         public async Task<IActionResult> GetMemberByEmail(string email)
         {
@@ -56,6 +61,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllMembers()
         {
@@ -63,13 +69,15 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        //[HttpGet("paged")]
-        //public async Task<IActionResult> GetAllMembersPaged()
-        //{
-        //    var result = await _memberService.GetAllMembersPagedAsync();
-        //    return Ok(result);
-        //}
+        [Authorize]
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetAllMembersPaged([FromQuery] PagedListDTO pagedListDTO)
+        {
+            var result = await _memberService.GetAllMembersPagedAsync(pagedListDTO);
+            return Ok(result);
+        }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateMember([FromBody] MemberRequestDTO MemberRequestDTO)
         {
@@ -77,6 +85,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMember([FromBody] MemberRequestDTO MemberRequestDTO, Guid id)
         {
@@ -84,6 +93,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("password/{id}")]
         public async Task<IActionResult> UpdateMemberPassword([FromBody] MemberRequestDTO MemberRequestDTO, Guid id)
         {
@@ -91,18 +101,12 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("delete/{id}")]
+        [Authorize]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMember(Guid id)
         {
-            try
-            {
-                await _memberService.DeleteMemberAsync(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _memberService.DeleteMemberAsync(id);
+            return NoContent();
         }
     }
 }

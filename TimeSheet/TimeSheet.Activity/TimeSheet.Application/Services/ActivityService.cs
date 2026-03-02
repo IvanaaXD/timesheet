@@ -7,6 +7,7 @@ using TimeSheet.Application.DTOs.Activity;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
+using TimeSheet.Application.Exceptions;
 
 namespace TimeSheet.Application.Services
 {
@@ -26,7 +27,7 @@ namespace TimeSheet.Application.Services
         public async Task<ActivityDTO> GetActivityByIdAsync(Guid id)
         {
             var activity = await _activityRepository.FindActivityByIdAsync(id);
-            if (activity == null) throw new KeyNotFoundException($"Activity with ID {id} not found.");
+            if (activity == null) throw new NotFoundException($"Activity with ID {id} not found.");
 
             return _mapper.Map<ActivityDTO>(activity);
         }
@@ -45,11 +46,13 @@ namespace TimeSheet.Application.Services
 
         public async Task<ActivityDTO> CreateActivityAsync(ActivityRequestDTO activityRequestDTO)
         {
+            var currentUserId = _currentUserService.UserId;
             var activity = _mapper.Map<Activity>(activityRequestDTO);
-            activity.Id = Guid.NewGuid();
-            activity.MemberId = _currentUserService.UserId;
 
+            activity.Id = Guid.NewGuid();
+            activity.MemberId = currentUserId;
             await _activityRepository.AddActivityAsync(activity);
+
             return _mapper.Map<ActivityDTO>(activity);
         }
 
@@ -58,14 +61,14 @@ namespace TimeSheet.Application.Services
             Guid? clientId,
             Guid? projectId,
             Guid? categoryId,
-            DateTime? startDate,
-            DateTime? endDate)
+            DateOnly? startDate,
+            DateOnly? endDate)
         {
             var activities = await _activityRepository.SearchActivitiesAsync(
                 memberId: _currentUserService.UserId,
-                clientId: null,
-                projectId: null,
-                categoryId: null,
+                clientId: clientId,
+                projectId: projectId,
+                categoryId: categoryId,
                 startDate: startDate,
                 endDate: endDate
             );

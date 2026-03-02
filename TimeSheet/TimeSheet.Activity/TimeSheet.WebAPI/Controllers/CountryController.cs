@@ -2,9 +2,11 @@
 using System.Threading.Tasks;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Country;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TimeSheet.WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CountryController : ControllerBase
@@ -16,32 +18,23 @@ namespace TimeSheet.WebAPI.Controllers
             _countryService = countryService;
         }
 
+        [Authorize]
         [HttpGet("id/{id}")]
         public async Task<IActionResult> GetCountryById(Guid id)
         {
             var result = await _countryService.GetCountryByIdAsync(id);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Country with ID {id} not found." });
-            }
-
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetCountryByName(string name)
         {
             var result = await _countryService.GetCountryByNameAsync(name);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Country with ID {name} not found." });
-            }
-
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllCountries()
         {
@@ -49,6 +42,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateCountry([FromBody] CountryRequestDTO CountryRequestDTO)
         {
@@ -56,7 +50,8 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [Authorize]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> UpdateCountry([FromBody] CountryRequestDTO CountryRequestDTO, Guid id)
         {
             var result = await _countryService.UpdateCountryAsync(id, CountryRequestDTO);
