@@ -35,8 +35,17 @@ namespace TimeSheet.Application.Services
             var member = await _memberRepository.FindMemberByIdAsync(memberId);
             if (member == null) throw new NotFoundException($"Member with ID {memberId} not found.");
 
+            if (member.Status == Domain.Entities.Enums.MemberStatus.INACTIVE)
+                throw new BadRequestException("Cannot assign an inactive member as a project lead.");
+
+            if (project.CurrentLeadId == memberId)
+                throw new ConflictException($"Member is already the current lead for this project.");
+
+            project.CurrentLeadId = memberId;
+            await _projectRepository.UpdateProjectAsync(project);
+
             var isLead = await _projectLeadRepository.IsMemberLeadOfProjectAsync(memberId, projectId);
-            if (isLead) return;
+            if (isLead) throw new ConflictException($"Member is already a lead for this project.");
 
             await _projectLeadRepository.AssignLeadAsync(projectId, memberId);
         }

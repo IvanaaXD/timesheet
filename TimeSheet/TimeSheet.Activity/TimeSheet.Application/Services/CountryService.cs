@@ -46,6 +46,13 @@ namespace TimeSheet.Application.Services
 
         public async Task<CountryDTO> CreateCountryAsync(CountryRequestDTO countryRequestDTO)
         {
+            var countryWithSameName = await _countryRepository.FindCountryByNameAsync(countryRequestDTO.Name);
+            if (countryWithSameName != null)
+                throw new ConflictException($"Country with name '{countryRequestDTO.Name}' already exists.");
+
+            if (string.IsNullOrWhiteSpace(countryRequestDTO.Name))
+                throw new ValidationException("Country name is required.");
+
             var country = _mapper.Map<Country>(countryRequestDTO);
             country.Id = Guid.NewGuid();
 
@@ -57,6 +64,12 @@ namespace TimeSheet.Application.Services
         {
             var existingCountry = await _countryRepository.FindCountryByIdAsync(id);
             if (existingCountry == null) throw new NotFoundException($"Country with ID {id} not found.");
+
+            var countryWithSameName = await _countryRepository.FindCountryByNameAsync(countryRequestDTO.Name);
+            if (countryWithSameName != null && countryWithSameName.Id != id)
+            {
+                throw new ConflictException($"Another country already has the name '{countryRequestDTO.Name}'.");
+            }
 
             _mapper.Map(countryRequestDTO, existingCountry);
 

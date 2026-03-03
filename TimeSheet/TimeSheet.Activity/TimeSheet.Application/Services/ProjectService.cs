@@ -17,12 +17,16 @@ namespace TimeSheet.Application.Services
     {
         private readonly IProjectRepository _projectRepository;
         private readonly IProjectLeadRepository _projectLeadRepository;
+        private readonly IClientRepository _clientRepository;
+        private readonly IMemberRepository _memberRepository;
         private readonly IMapper _mapper;
 
-        public ProjectService(IProjectRepository projectRepository, IProjectLeadRepository projectLeadRepository, IMapper mapper)
+        public ProjectService(IProjectRepository projectRepository, IProjectLeadRepository projectLeadRepository,IClientRepository clientRepository, IMemberRepository memberRepository, IMapper mapper)
         {
             _projectRepository = projectRepository;
             _projectLeadRepository = projectLeadRepository;
+            _clientRepository = clientRepository;
+            _memberRepository = memberRepository;
             _mapper = mapper;
         }
 
@@ -52,6 +56,14 @@ namespace TimeSheet.Application.Services
 
         public async Task<ProjectDTO> CreateProjectAsync(ProjectRequestDTO projectRequestDTO)
         {
+            var client = await _clientRepository.FindClientByIdAsync(projectRequestDTO.ClientId);
+            if (client == null) throw new NotFoundException($"Client with ID {projectRequestDTO.ClientId} not found.");
+
+            var member = await _memberRepository.FindMemberByIdAsync(projectRequestDTO.CurrentLead);
+            if (member == null) throw new NotFoundException($"Member with ID {projectRequestDTO.CurrentLead} not found.");
+
+            // provjera imena projekta?
+
             var project = _mapper.Map<Project>(projectRequestDTO);
             project.Id = Guid.NewGuid();
 
@@ -66,6 +78,12 @@ namespace TimeSheet.Application.Services
         {
             var existingProject = await _projectRepository.FindProjectByIdAsync(id);
             if (existingProject == null) throw new NotFoundException($"Project with ID {id} not found.");
+
+            if (existingProject.CurrentLeadId != projectRequestDTO.CurrentLead)
+            {
+                var leadExists = await _memberRepository.FindMemberByIdAsync(projectRequestDTO.CurrentLead);
+                if (leadExists == null) throw new NotFoundException("New Lead member not found.");
+            }
 
             _mapper.Map(projectRequestDTO, existingProject);
             await _projectRepository.UpdateProjectAsync(existingProject);

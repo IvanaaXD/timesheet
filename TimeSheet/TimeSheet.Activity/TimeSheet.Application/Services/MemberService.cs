@@ -82,6 +82,17 @@ namespace TimeSheet.Application.Services
 
         public async Task<MemberDTO> CreateMemberAsync(MemberRequestDTO memberRequestDTO)
         {
+            var existingUsername = await _memberRepository.FindMemberByUsernameAsync(memberRequestDTO.Username);
+            if (existingUsername != null)
+                throw new ConflictException($"Username '{memberRequestDTO.Username}' is already taken.");
+
+            var existingEmail = await _memberRepository.FindMemberByEmailAsync(memberRequestDTO.Email);
+            if (existingEmail != null)
+                throw new ConflictException($"Email '{memberRequestDTO.Email}' is already registered.");
+
+            if (memberRequestDTO.HoursPerWeek < 0 || memberRequestDTO.HoursPerWeek > 168)
+                throw new ValidationException("Hours per week must be between 0 and 168.");
+
             var member = _mapper.Map<Member>(memberRequestDTO);
             member.Id = Guid.NewGuid();
 
@@ -100,33 +111,43 @@ namespace TimeSheet.Application.Services
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
             if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
 
+            var memberWithEmail = await _memberRepository.FindMemberByEmailAsync(memberRequestDTO.Email);
+            if (memberWithEmail != null && memberWithEmail.Id != id)
+                throw new ConflictException("This email is already assigned to another member.");
+
+            var memberWithUsername = await _memberRepository.FindMemberByUsernameAsync(memberRequestDTO.Username);
+            if (memberWithUsername != null && memberWithUsername.Id != id)
+                throw new ConflictException("This username is already assigned to another member.");
+
             _mapper.Map(memberRequestDTO, existingMember);
             await _memberRepository.UpdateMemberAsync(existingMember);
 
             var updatedMember = await _memberRepository.FindMemberByIdAsync(id);
-            return _mapper.Map<MemberDTO>(updatedMember);
+            return _mapper.Map<MemberDTO>(existingMember);
         }
 
-        public async Task<MemberDTO> UpdateMemberPasswordAsync(Guid id, MemberRequestDTO memberRequestDTO)
+        public async Task<MemberDTO> UpdateMemberPasswordAsync(Guid id) 
         {
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
             if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
 
             string plainPassword = GenerateRandomPassword(10);
             existingMember.Password = _passwordHasher.HashPassword(plainPassword);
-            await _emailService.SendPasswordUpdatedEmailAsync(existingMember.Email, plainPassword);
 
-            _mapper.Map(memberRequestDTO, existingMember);
+            await _emailService.SendPasswordUpdatedEmailAsync(existingMember.Email, plainPassword);
             await _memberRepository.UpdateMemberAsync(existingMember);
 
             var updatedMember = await _memberRepository.FindMemberByIdAsync(id);
-            return _mapper.Map<MemberDTO>(updatedMember);
+            return _mapper.Map<MemberDTO>(existingMember);
         }
 
         public async Task DeleteMemberAsync(Guid id)
         {
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
             if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
+
+            if (existingMember.LeadingAssignments != null && existingMember.LeadingAssignments.Any())
+                throw new BadRequestException("Cannot delete member who is currently a Lead on one or more projects.");
 
             await _memberRepository.DeleteMemberAsync(existingMember);
         }

@@ -16,11 +16,13 @@ namespace TimeSheet.Application.Services
     public class ClientService : IClientService
     {
         private readonly IClientRepository _clientRepository;
+        private readonly ICountryRepository _countryRepository;
         private readonly IMapper _mapper;
 
-        public ClientService(IClientRepository clientRepository, IMapper mapper)
+        public ClientService(IClientRepository clientRepository, ICountryRepository countryRepository, IMapper mapper)
         {
             _clientRepository = clientRepository;
+            _countryRepository = countryRepository;
             _mapper = mapper;
         }
 
@@ -58,6 +60,14 @@ namespace TimeSheet.Application.Services
 
         public async Task<ClientDTO> CreateClientAsync(ClientRequestDTO clientRequestDTO)
         {
+            var existing = await _clientRepository.FindClientByNameAsync(clientRequestDTO.Name);
+            if (existing != null)
+                throw new ConflictException($"Client with name '{clientRequestDTO.Name}' already exists.");
+
+            var country = await _countryRepository.FindCountryByIdAsync(clientRequestDTO.CountryId);
+            if (country == null)
+                throw new NotFoundException($"Country with ID {clientRequestDTO.CountryId} not found.");
+
             var client = _mapper.Map<Client>(clientRequestDTO);
             client.Id = Guid.NewGuid();
 
@@ -71,6 +81,14 @@ namespace TimeSheet.Application.Services
         {
             var existingClient = await _clientRepository.FindClientByIdAsync(id);
             if (existingClient == null) throw new NotFoundException($"Client with ID {id} not found.");
+
+            var clientWithSameName = await _clientRepository.FindClientByNameAsync(clientRequestDTO.Name);
+            if (clientWithSameName != null && clientWithSameName.Id != id)
+                throw new ConflictException($"Another client already has the name '{clientRequestDTO.Name}'.");
+
+            var country = await _countryRepository.FindCountryByIdAsync(clientRequestDTO.CountryId);
+            if (country == null)
+                throw new NotFoundException($"Country with ID {clientRequestDTO.CountryId} not found.");
 
             _mapper.Map(clientRequestDTO, existingClient);
             await _clientRepository.UpdateClientAsync(existingClient);

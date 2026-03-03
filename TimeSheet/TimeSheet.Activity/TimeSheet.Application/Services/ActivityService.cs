@@ -8,6 +8,7 @@ using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Application.Exceptions;
+using TimeSheet.Domain.Entities.Enums;
 
 namespace TimeSheet.Application.Services
 {
@@ -15,6 +16,8 @@ namespace TimeSheet.Application.Services
     {
         private readonly IActivityRepository _activityRepository;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IProjectRepository _projectRepository; 
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
         public ActivityService(IActivityRepository activityRepository, ICurrentUserService currentUserService, IMapper mapper)
@@ -46,13 +49,26 @@ namespace TimeSheet.Application.Services
 
         public async Task<ActivityDTO> CreateActivityAsync(ActivityRequestDTO activityRequestDTO)
         {
-            var currentUserId = _currentUserService.UserId;
+            var project = await _projectRepository.FindProjectByIdAsync(activityRequestDTO.ProjectId);
+            if (project == null) throw new NotFoundException($"Project with ID {activityRequestDTO.ProjectId} not found.");
+
+            var category = await _categoryRepository.FindCategoryByIdAsync(activityRequestDTO.CategoryId);
+            if (category == null) throw new NotFoundException($"Category with ID {activityRequestDTO.CategoryId} not found.");
+
+            if (activityRequestDTO.Time < 0 || activityRequestDTO.OverTime < 0)
+                throw new ValidationException("Hours cannot be negative.");
+
+            if (activityRequestDTO.Time + activityRequestDTO.OverTime > 24)
+                throw new ValidationException("Total hours in a day cannot exceed 24.");
+
+            if (project.Status == ProjectStatus.INACTIVE) 
+                throw new BadRequestException("Cannot log time on an inactive project.");
+
             var activity = _mapper.Map<Activity>(activityRequestDTO);
-
             activity.Id = Guid.NewGuid();
-            activity.MemberId = currentUserId;
-            await _activityRepository.AddActivityAsync(activity);
+            activity.MemberId = _currentUserService.UserId;
 
+            await _activityRepository.AddActivityAsync(activity);
             return _mapper.Map<ActivityDTO>(activity);
         }
 
@@ -65,7 +81,7 @@ namespace TimeSheet.Application.Services
             DateOnly? endDate)
         {
             var activities = await _activityRepository.SearchActivitiesAsync(
-                memberId: _currentUserService.UserId,
+                memberId: memberId,
                 clientId: clientId,
                 projectId: projectId,
                 categoryId: categoryId,

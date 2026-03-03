@@ -95,9 +95,9 @@ namespace TimeSheet.WebAPI.Controllers
 
         [Authorize]
         [HttpPut("password/{id}")]
-        public async Task<IActionResult> UpdateMemberPassword([FromBody] MemberRequestDTO MemberRequestDTO, Guid id)
+        public async Task<IActionResult> UpdateMemberPassword(Guid id)
         {
-            var result = await _memberService.UpdateMemberPasswordAsync(id, MemberRequestDTO);
+            var result = await _memberService.UpdateMemberPasswordAsync(id);
             return Ok(result);
         }
 

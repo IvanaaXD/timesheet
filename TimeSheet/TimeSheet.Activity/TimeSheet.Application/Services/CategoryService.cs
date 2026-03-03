@@ -42,10 +42,18 @@ namespace TimeSheet.Application.Services
         {
             var categories = await _categoryRepository.FindAllCategoriesAsync();
             return _mapper.Map<IEnumerable<CategoryDTO>>(categories);
+
         }
 
         public async Task<CategoryDTO> CreateCategoryAsync(CategoryRequestDTO categoryRequestDTO)
         {
+            var existing = await _categoryRepository.FindCategoryByNameAsync(categoryRequestDTO.Name);
+            if (existing != null)
+                throw new ConflictException($"Category with name '{categoryRequestDTO.Name}' already exists.");
+
+            if (string.IsNullOrWhiteSpace(categoryRequestDTO.Name))
+                throw new ValidationException("Category name cannot be empty.");
+
             var category = _mapper.Map<Category>(categoryRequestDTO);
             category.Id = Guid.NewGuid();
 
@@ -55,8 +63,16 @@ namespace TimeSheet.Application.Services
 
         public async Task<CategoryDTO> UpdateCategoryAsync(Guid id, CategoryRequestDTO categoryRequestDTO)
         {
-            var existingCategory= await _categoryRepository.FindCategoryByIdAsync(id);
-            if (existingCategory == null) throw new NotFoundException($"Category with ID {id} not found.");
+            var existingCategory = await _categoryRepository.FindCategoryByIdAsync(id);
+            if (existingCategory == null)
+               throw new NotFoundException($"Category with ID {id} not found.");
+
+            var categoryWithSameName = await _categoryRepository.FindCategoryByNameAsync(categoryRequestDTO.Name);
+
+            if (categoryWithSameName != null && categoryWithSameName.Id != id)
+            {
+                throw new ConflictException($"Category with name '{categoryRequestDTO.Name}' already exists.");
+            }
 
             _mapper.Map(categoryRequestDTO, existingCategory);
 
