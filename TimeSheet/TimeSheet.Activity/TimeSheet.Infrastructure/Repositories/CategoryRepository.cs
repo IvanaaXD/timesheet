@@ -31,15 +31,17 @@ namespace TimeSheet.Infrastructure.Repositories
             return await _context.Categories.AsNoTracking().ToListAsync();
         }
 
-        public async Task AddCategoryAsync(Category category)
+        public async Task<Category> AddCategoryAsync(Category category)
         {
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
+            return category;
         }
 
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task<Category> UpdateCategoryAsync(Category category)
         {
             await _context.SaveChangesAsync();
+            return category;
         }
     }
 }

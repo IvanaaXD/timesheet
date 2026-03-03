@@ -13,7 +13,7 @@ namespace TimeSheet.Application.DTOs.Project
         // Relationships
 
         public Guid ClientId { get; set; }
-        public Guid CurrentLead { get; set; }
+        public Guid? CurrentLead { get; set; }
 
         // Constructors
 

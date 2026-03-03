@@ -9,7 +9,7 @@ using TimeSheet.Application.DTOs.Auth;
 using TimeSheet.Application.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace TimeSheet.Infrastructure.Identity
+namespace TimeSheet.Application.Services
 {
     public class CurrentUserService : ICurrentUserService
     {

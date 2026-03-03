@@ -7,18 +7,23 @@ using TimeSheet.Application.DTOs.Category;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
-using TimeSheet.Application.Exceptions;
+using TimeSheet.Application.Common.Exceptions;
+using FluentValidation;
+using TimeSheet.Application.Validators;
+using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class CategoryService : ICategoryService
+    public class CategoryService : BaseService, ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IValidator<CategoryRequestDTO> _validator;
         private readonly IMapper _mapper;
 
-        public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
+        public CategoryService(ICategoryRepository categoryRepository, IValidator<CategoryRequestDTO> validator, IMapper mapper)
         {
             _categoryRepository = categoryRepository;
+            _validator = validator;
             _mapper = mapper;
         }
 
@@ -47,22 +52,22 @@ namespace TimeSheet.Application.Services
 
         public async Task<CategoryDTO> CreateCategoryAsync(CategoryRequestDTO categoryRequestDTO)
         {
+            await ValidateAsync(_validator, categoryRequestDTO);
+
             var existing = await _categoryRepository.FindCategoryByNameAsync(categoryRequestDTO.Name);
             if (existing != null)
                 throw new ConflictException($"Category with name '{categoryRequestDTO.Name}' already exists.");
 
-            if (string.IsNullOrWhiteSpace(categoryRequestDTO.Name))
-                throw new ValidationException("Category name cannot be empty.");
-
             var category = _mapper.Map<Category>(categoryRequestDTO);
-            category.Id = Guid.NewGuid();
 
-            await _categoryRepository.AddCategoryAsync(category);
-            return _mapper.Map<CategoryDTO>(category);
+            var createdCatrgoty = await _categoryRepository.AddCategoryAsync(category);
+            return _mapper.Map<CategoryDTO>(createdCatrgoty);
         }
 
         public async Task<CategoryDTO> UpdateCategoryAsync(Guid id, CategoryRequestDTO categoryRequestDTO)
         {
+            await ValidateAsync(_validator, categoryRequestDTO);
+
             var existingCategory = await _categoryRepository.FindCategoryByIdAsync(id);
             if (existingCategory == null)
                throw new NotFoundException($"Category with ID {id} not found.");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using TimeSheet.Domain.Entities;
 
 namespace TimeSheet.Domain.Interfaces
@@ -8,7 +9,7 @@ namespace TimeSheet.Domain.Interfaces
         Task<Activity> FindActivityByIdAsync(Guid id);
         Task<IEnumerable<Activity>> FindActivitiesByDateAsync(DateOnly date);
         Task<IEnumerable<Activity>> FindAllActivitiesAsync();
-        Task AddActivityAsync(Activity activity);
+        Task<Activity> AddActivityAsync(Activity activity);
         //Task UpdateActivityAsync(Activity activity);
         //Task DeleteActivityAsync(Activity activity);
         Task<IEnumerable<Activity>> SearchActivitiesAsync(

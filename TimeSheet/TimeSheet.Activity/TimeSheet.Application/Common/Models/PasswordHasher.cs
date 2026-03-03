@@ -1,7 +1,7 @@
 using BCrypt.Net;
 using TimeSheet.Application.Abstractions;
 
-namespace TimeSheet.Infrastructure.Identity
+namespace TimeSheet.Application.Common.Models
 {
     public class PasswordHasher : IPasswordHasher
     {

@@ -38,15 +38,17 @@ namespace TimeSheet.Infrastructure.Repositories
             return await _context.Members.AsNoTracking().ToListAsync();
         }
 
-        public async Task AddMemberAsync(Member member)
+        public async Task<Member> AddMemberAsync(Member member)
         {
             _context.Members.Add(member);   
             await _context.SaveChangesAsync();
+            return member;
         }
 
-        public async Task UpdateMemberAsync(Member member)
+        public async Task<Member> UpdateMemberAsync(Member member)
         {
             await _context.SaveChangesAsync();
+            return member;
         }
 
         public async Task UpdateMemberPasswordAsync(Member member)

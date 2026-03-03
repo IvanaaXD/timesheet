@@ -7,23 +7,28 @@ using TimeSheet.Application.DTOs.Activity;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
-using TimeSheet.Application.Exceptions;
 using TimeSheet.Domain.Entities.Enums;
+using TimeSheet.Application.Common.Exceptions;
+using FluentValidation;
+using TimeSheet.Application.Validators;
+using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class ActivityService : IActivityService
+    public class ActivityService : BaseService, IActivityService
     {
         private readonly IActivityRepository _activityRepository;
         private readonly ICurrentUserService _currentUserService;
         private readonly IProjectRepository _projectRepository; 
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IValidator<ActivityRequestDTO> _validator;
         private readonly IMapper _mapper;
 
-        public ActivityService(IActivityRepository activityRepository, ICurrentUserService currentUserService, IMapper mapper)
+        public ActivityService(IActivityRepository activityRepository, ICurrentUserService currentUserService, IValidator<ActivityRequestDTO> validator, IMapper mapper)
         {
             _activityRepository = activityRepository;
             _currentUserService = currentUserService;
+            _validator = validator;
             _mapper = mapper;
         }
 
@@ -49,27 +54,22 @@ namespace TimeSheet.Application.Services
 
         public async Task<ActivityDTO> CreateActivityAsync(ActivityRequestDTO activityRequestDTO)
         {
+            await ValidateAsync(_validator, activityRequestDTO);
+
             var project = await _projectRepository.FindProjectByIdAsync(activityRequestDTO.ProjectId);
             if (project == null) throw new NotFoundException($"Project with ID {activityRequestDTO.ProjectId} not found.");
 
             var category = await _categoryRepository.FindCategoryByIdAsync(activityRequestDTO.CategoryId);
             if (category == null) throw new NotFoundException($"Category with ID {activityRequestDTO.CategoryId} not found.");
 
-            if (activityRequestDTO.Time < 0 || activityRequestDTO.OverTime < 0)
-                throw new ValidationException("Hours cannot be negative.");
-
-            if (activityRequestDTO.Time + activityRequestDTO.OverTime > 24)
-                throw new ValidationException("Total hours in a day cannot exceed 24.");
-
             if (project.Status == ProjectStatus.INACTIVE) 
                 throw new BadRequestException("Cannot log time on an inactive project.");
 
             var activity = _mapper.Map<Activity>(activityRequestDTO);
-            activity.Id = Guid.NewGuid();
             activity.MemberId = _currentUserService.UserId;
 
-            await _activityRepository.AddActivityAsync(activity);
-            return _mapper.Map<ActivityDTO>(activity);
+            var createdActivity = await _activityRepository.AddActivityAsync(activity);
+            return _mapper.Map<ActivityDTO>(createdActivity);
         }
 
         public async Task<IEnumerable<ActivityDTO>> SearchActivitiesAsync(

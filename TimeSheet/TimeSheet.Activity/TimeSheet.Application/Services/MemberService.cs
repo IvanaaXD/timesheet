@@ -9,22 +9,27 @@ using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Application.Common.DTOs;
 using TimeSheet.Domain.Common.Models;
-using TimeSheet.Application.Exceptions;
+using TimeSheet.Application.Common.Exceptions;
+using FluentValidation;
+using TimeSheet.Application.Validators;
+using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class MemberService : IMemberService
+    public class MemberService : BaseService, IMemberService
     {
         private readonly IMemberRepository _memberRepository;
         private readonly IEmailService _emailService;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IValidator<MemberRequestDTO> _validator;
         private readonly IMapper _mapper;
 
-        public MemberService(IMemberRepository memberRepository, IMapper mapper, IEmailService emailService, IPasswordHasher passwordHasher)
+        public MemberService(IMemberRepository memberRepository, IMapper mapper, IEmailService emailService, IValidator<MemberRequestDTO> validator, IPasswordHasher passwordHasher)
         {
             _memberRepository = memberRepository;
             _emailService = emailService;
             _passwordHasher = passwordHasher;
+            _validator = validator;
             _mapper = mapper;
         }
 
@@ -82,6 +87,8 @@ namespace TimeSheet.Application.Services
 
         public async Task<MemberDTO> CreateMemberAsync(MemberRequestDTO memberRequestDTO)
         {
+            await ValidateAsync(_validator, memberRequestDTO);
+
             var existingUsername = await _memberRepository.FindMemberByUsernameAsync(memberRequestDTO.Username);
             if (existingUsername != null)
                 throw new ConflictException($"Username '{memberRequestDTO.Username}' is already taken.");
@@ -90,9 +97,6 @@ namespace TimeSheet.Application.Services
             if (existingEmail != null)
                 throw new ConflictException($"Email '{memberRequestDTO.Email}' is already registered.");
 
-            if (memberRequestDTO.HoursPerWeek < 0 || memberRequestDTO.HoursPerWeek > 168)
-                throw new ValidationException("Hours per week must be between 0 and 168.");
-
             var member = _mapper.Map<Member>(memberRequestDTO);
             member.Id = Guid.NewGuid();
 
@@ -100,14 +104,14 @@ namespace TimeSheet.Application.Services
             member.Password = _passwordHasher.HashPassword(plainPassword);
             await _emailService.SendWelcomeEmailAsync(member.Email, plainPassword);
 
-            await _memberRepository.AddMemberAsync(member);
-
-            var createdMember = await _memberRepository.FindMemberByIdAsync(member.Id);
+            var createdMember = await _memberRepository.AddMemberAsync(member);
             return _mapper.Map<MemberDTO>(createdMember);
         }
 
         public async Task<MemberDTO> UpdateMemberAsync(Guid id, MemberRequestDTO memberRequestDTO)
         {
+            await ValidateAsync(_validator, memberRequestDTO);
+
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
             if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
 
@@ -120,10 +124,8 @@ namespace TimeSheet.Application.Services
                 throw new ConflictException("This username is already assigned to another member.");
 
             _mapper.Map(memberRequestDTO, existingMember);
-            await _memberRepository.UpdateMemberAsync(existingMember);
-
-            var updatedMember = await _memberRepository.FindMemberByIdAsync(id);
-            return _mapper.Map<MemberDTO>(existingMember);
+            var updatedMember = await _memberRepository.UpdateMemberAsync(existingMember);
+            return _mapper.Map<MemberDTO>(updatedMember);
         }
 
         public async Task<MemberDTO> UpdateMemberPasswordAsync(Guid id) 
@@ -135,10 +137,9 @@ namespace TimeSheet.Application.Services
             existingMember.Password = _passwordHasher.HashPassword(plainPassword);
 
             await _emailService.SendPasswordUpdatedEmailAsync(existingMember.Email, plainPassword);
-            await _memberRepository.UpdateMemberAsync(existingMember);
 
-            var updatedMember = await _memberRepository.FindMemberByIdAsync(id);
-            return _mapper.Map<MemberDTO>(existingMember);
+            var updatedMember = await _memberRepository.UpdateMemberAsync(existingMember);
+            return _mapper.Map<MemberDTO>(updatedMember);
         }
 
         public async Task DeleteMemberAsync(Guid id)

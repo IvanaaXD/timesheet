@@ -32,15 +32,17 @@ namespace TimeSheet.Infrastructure.Repositories
             return await _context.Clients.Include(c => c.Country).AsNoTracking().ToListAsync();
         }
 
-        public async Task AddClientAsync(Client client)
+        public async Task<Client> AddClientAsync(Client client)
         {
             _context.Clients.Add(client);
             await _context.SaveChangesAsync();
+            return client;
         }
 
-        public async Task UpdateClientAsync(Client client)
+        public async Task<Client> UpdateClientAsync(Client client)
         {
             await _context.SaveChangesAsync();
+            return client;
         }
 
         public async Task DeleteClientAsync(Client client)

@@ -31,15 +31,17 @@ namespace TimeSheet.Infrastructure.Repositories
             return await _context.Countries.AsNoTracking().ToListAsync();
         }
 
-        public async Task AddCountryAsync(Country country)
+        public async Task<Country> AddCountryAsync(Country country)
         {
             _context.Countries.Add(country);
             await _context.SaveChangesAsync();
+            return country;
         }
 
-        public async Task UpdateCountryAsync(Country country)
+        public async Task<Country> UpdateCountryAsync(Country country)
         {
             await _context.SaveChangesAsync();
+            return country;
         }
     }
 }

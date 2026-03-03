@@ -1,6 +1,6 @@
 using System;
 
-namespace TimeSheet.Application.Exceptions
+namespace TimeSheet.Application.Common.Exceptions
 {
     public class NotFoundException : Exception
     {

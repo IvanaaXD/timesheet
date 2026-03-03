@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TimeSheet.Application.Exceptions;
+using TimeSheet.Application.Common.Exceptions;
 
-namespace TimeSheet.Infrastructure.Middleware
+namespace TimeSheet.WebAPI.Middleware
 {
     public sealed class GlobalExceptionHandler : IExceptionHandler
     {
@@ -26,27 +26,15 @@ namespace TimeSheet.Infrastructure.Middleware
             Exception exception,
             CancellationToken cancellationToken)
         {
-            var (statusCode, title) = exception switch
-            {
-                NotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
-                BadRequestException => (StatusCodes.Status400BadRequest, "Invalid Request"),
-                ConflictException => (StatusCodes.Status409Conflict, "Resource Already Exists"),
-                ValidationException => (StatusCodes.Status400BadRequest, "Validation Error"),
-                ForbiddenException => (StatusCodes.Status403Forbidden, "Forbidden Access"),
-                DbUpdateException => (StatusCodes.Status409Conflict, "Database Constraint Violation"),
-                TaskCanceledException or OperationCanceledException => (StatusCodes.Status408RequestTimeout, "Request Timeout"),
-                UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Access Denied"),
-                
-                _ => (StatusCodes.Status500InternalServerError, "Server Error")
-            };
+            var details = ExceptionDictionary.GetDetails(exception);
 
             _logger.LogError(
                 exception, "Exception occurred: {Message}", exception.Message);
 
             var problemDetails = new ProblemDetails
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Server error",
+                Status = details.StatusCode,
+                Title = details.Title,       
                 Detail = exception.Message
             };
 

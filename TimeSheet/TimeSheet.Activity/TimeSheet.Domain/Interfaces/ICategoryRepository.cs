@@ -1,4 +1,5 @@
-﻿using TimeSheet.Domain.Entities;
+﻿using System.Threading.Tasks;
+using TimeSheet.Domain.Entities;
 
 namespace TimeSheet.Domain.Interfaces
 {
@@ -7,7 +8,7 @@ namespace TimeSheet.Domain.Interfaces
         Task<Category> FindCategoryByIdAsync(Guid id);
         Task<Category> FindCategoryByNameAsync(string name);
         Task<IEnumerable<Category>> FindAllCategoriesAsync();
-        Task AddCategoryAsync(Category category);
-        Task UpdateCategoryAsync(Category category);
+        Task<Category> AddCategoryAsync(Category category);
+        Task<Category> UpdateCategoryAsync(Category category);
     }
 }

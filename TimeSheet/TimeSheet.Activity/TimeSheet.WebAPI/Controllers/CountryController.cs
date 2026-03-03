@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Country;
 using Microsoft.AspNetCore.Authorization;
+using TimeSheet.Domain.Entities.Enums;
 
 namespace TimeSheet.WebAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CountryController : ControllerBase
@@ -42,7 +42,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateCountry([FromBody] CountryRequestDTO CountryRequestDTO)
         {
@@ -50,7 +50,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> UpdateCountry([FromBody] CountryRequestDTO CountryRequestDTO, Guid id)
         {

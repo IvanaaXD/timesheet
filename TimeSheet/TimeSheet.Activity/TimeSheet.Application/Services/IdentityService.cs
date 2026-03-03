@@ -16,9 +16,9 @@ using TimeSheet.Application.Abstractions;
 using System.Security.Cryptography;
 using TimeSheet.Domain.Entities.Enums;
 using TimeSheet.Domain.Common.Models;
-using TimeSheet.Infrastructure.Repositories;
+using TimeSheet.Application.Common.Exceptions;
 
-namespace TimeSheet.Infrastructure.Identity
+namespace TimeSheet.Application.Services
 {
     public class IdentityService : IIdentityService
     {
@@ -33,27 +33,13 @@ namespace TimeSheet.Infrastructure.Identity
             _configuration = configuration;
         }
 
-        public async Task<AuthResult> LoginAsync(LoginRequest request)
+        public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
             var member = await _memberRepository.FindMemberByUsernameAsync(request.Username);
-
-            if (member == null)
-            {
-                return new AuthResult
-                {
-                    StatusCode = 404,
-                };
-            }
+            if (member == null) throw new NotFoundException($"Member with username {request.Username} not found.");
 
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, member.Password);
-
-            if (!isPasswordValid)
-            {
-                return new AuthResult
-                {
-                    StatusCode = 401,
-                };
-            }
+            if (!isPasswordValid) throw new ValidationException("Incorrect credentials.");
 
             var accessToken = GenerateAccessToken(member.Id, member.Username, member.Role);
 
@@ -66,16 +52,12 @@ namespace TimeSheet.Infrastructure.Identity
             };
             await _tokenRepository.SaveRefreshToken(refreshToken);
 
-            return new AuthResult
+            return  new AuthResponse
             {
-                StatusCode = 200,
-                Data = new AuthResponse
-                {
-                    Id = member.Id,
-                    Username = member.Username,
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken.TokenString
-                }
+                Id = member.Id,
+                Username = member.Username,
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.TokenString
             };
         }
 
@@ -104,7 +86,7 @@ namespace TimeSheet.Infrastructure.Identity
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Role, role.ToString())
             }),
-                Expires = DateTime.UtcNow.AddHours(3),
+                Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiryInMinutes"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = jwtSettings["Issuer"],
                 Audience = jwtSettings["Audience"]

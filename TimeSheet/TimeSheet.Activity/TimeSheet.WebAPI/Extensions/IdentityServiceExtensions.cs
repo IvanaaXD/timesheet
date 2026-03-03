@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using TimeSheet.Infrastructure.Identity;
 using TimeSheet.Application.Abstractions;
+using TimeSheet.Application.Services;
 
 namespace TimeSheet.WebAPI.Extensions
 {

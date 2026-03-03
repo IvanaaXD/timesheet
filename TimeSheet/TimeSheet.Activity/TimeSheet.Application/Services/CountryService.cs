@@ -7,18 +7,23 @@ using TimeSheet.Application.DTOs.Country;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
-using TimeSheet.Application.Exceptions;
+using TimeSheet.Application.Common.Exceptions;
+using FluentValidation;
+using TimeSheet.Application.Validators;
+using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class CountryService : ICountryService
+    public class CountryService : BaseService, ICountryService
     {
         private readonly ICountryRepository _countryRepository;
+        private readonly IValidator<CountryRequestDTO> _validator;
         private readonly IMapper _mapper;
 
-        public CountryService(ICountryRepository countryRepository, IMapper mapper)
+        public CountryService(ICountryRepository countryRepository, IValidator<CountryRequestDTO> validator, IMapper mapper)
         {
             _countryRepository = countryRepository;
+            _validator = validator;
             _mapper = mapper;
         }
 
@@ -46,22 +51,22 @@ namespace TimeSheet.Application.Services
 
         public async Task<CountryDTO> CreateCountryAsync(CountryRequestDTO countryRequestDTO)
         {
+            await ValidateAsync(_validator, countryRequestDTO);
+
             var countryWithSameName = await _countryRepository.FindCountryByNameAsync(countryRequestDTO.Name);
             if (countryWithSameName != null)
                 throw new ConflictException($"Country with name '{countryRequestDTO.Name}' already exists.");
 
-            if (string.IsNullOrWhiteSpace(countryRequestDTO.Name))
-                throw new ValidationException("Country name is required.");
-
             var country = _mapper.Map<Country>(countryRequestDTO);
-            country.Id = Guid.NewGuid();
 
-            await _countryRepository.AddCountryAsync(country);
-            return _mapper.Map<CountryDTO>(country);
+            var createdCountry = await _countryRepository.AddCountryAsync(country);
+            return _mapper.Map<CountryDTO>(createdCountry);
         }
 
         public async Task<CountryDTO> UpdateCountryAsync(Guid id, CountryRequestDTO countryRequestDTO)
         {
+            await ValidateAsync(_validator, countryRequestDTO); 
+
             var existingCountry = await _countryRepository.FindCountryByIdAsync(id);
             if (existingCountry == null) throw new NotFoundException($"Country with ID {id} not found.");
 
@@ -73,8 +78,8 @@ namespace TimeSheet.Application.Services
 
             _mapper.Map(countryRequestDTO, existingCountry);
 
-            await _countryRepository.UpdateCountryAsync(existingCountry);
-            return _mapper.Map<CountryDTO>(existingCountry);
+            var updatedCountry = await _countryRepository.UpdateCountryAsync(existingCountry);
+            return _mapper.Map<CountryDTO>(updatedCountry);
         }
     }
 }

@@ -4,10 +4,10 @@ using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Member;
 using TimeSheet.Application.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using TimeSheet.Domain.Entities.Enums;
 
 namespace TimeSheet.WebAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class MemberController : ControllerBase
@@ -77,7 +77,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateMember([FromBody] MemberRequestDTO MemberRequestDTO)
         {
@@ -85,7 +85,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMember([FromBody] MemberRequestDTO MemberRequestDTO, Guid id)
         {
@@ -101,7 +101,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMember(Guid id)
         {

@@ -8,7 +8,7 @@ using TimeSheet.Application.DTOs.Project;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
-using TimeSheet.Application.Exceptions;
+using TimeSheet.Application.Common.Exceptions;
 
 namespace TimeSheet.Application.Services
 {
@@ -44,10 +44,11 @@ namespace TimeSheet.Application.Services
             project.CurrentLeadId = memberId;
             await _projectRepository.UpdateProjectAsync(project);
 
-            var isLead = await _projectLeadRepository.IsMemberLeadOfProjectAsync(memberId, projectId);
-            if (isLead) throw new ConflictException($"Member is already a lead for this project.");
-
-            await _projectLeadRepository.AssignLeadAsync(projectId, memberId);
+            var alreadyAssigned = await _projectLeadRepository.IsMemberLeadOfProjectAsync(memberId, projectId);
+            if (!alreadyAssigned)
+            {
+                await _projectLeadRepository.AssignLeadAsync(projectId, memberId);
+            }
         }
 
         public async Task RemoveLeadAsync(Guid projectId, Guid memberId)

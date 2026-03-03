@@ -9,10 +9,11 @@ using TimeSheet.Infrastructure.Repositories;
 using TimeSheet.Application.Services;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Infrastructure.Email;
-using TimeSheet.Infrastructure.Identity;
 using TimeSheet.Application.Common.Models;
 using AutoMapper;
-using TimeSheet.Infrastructure.Middleware;
+using TimeSheet.WebAPI.Middleware;
+using FluentValidation;
+using TimeSheet.Application.Validators;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -77,6 +78,13 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CategoryDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CountryDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ClientDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<MemberDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ProjectDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ActivityDTOValidator>();
 
 var app = builder.Build();
 

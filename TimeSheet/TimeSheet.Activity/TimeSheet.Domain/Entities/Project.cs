@@ -17,8 +17,8 @@ namespace TimeSheet.Domain.Entities
         public Guid ClientId { get; set; }
         public virtual Client Client { get; set; }
 
-        public Guid CurrentLeadId { get; set; }
-        public virtual Member CurrentLead { get; set; }
+        public Guid? CurrentLeadId { get; set; }
+        public virtual Member? CurrentLead { get; set; }
 
         // Constructors
 

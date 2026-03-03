@@ -4,10 +4,10 @@ using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Client;
 using TimeSheet.Application.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using TimeSheet.Domain.Entities.Enums;
 
 namespace TimeSheet.WebAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ClientController : ControllerBase
@@ -51,7 +51,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateClient([FromBody] ClientRequestDTO clientRequestDTO)
         {
@@ -59,7 +59,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateClient([FromBody] ClientRequestDTO clientRequestDTO, Guid id)
         {
@@ -67,7 +67,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClient(Guid id) 
         {

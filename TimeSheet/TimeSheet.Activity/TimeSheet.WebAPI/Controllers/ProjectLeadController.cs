@@ -6,7 +6,6 @@ using TimeSheet.Application.DTOs.ProjectLead;
 
 namespace TimeSheet.WebAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProjectLeadController : ControllerBase

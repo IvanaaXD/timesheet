@@ -30,15 +30,17 @@ namespace TimeSheet.Infrastructure.Repositories
             return await _context.Projects.Include(p => p.Client).Include(p => p.CurrentLead).AsNoTracking().ToListAsync();
         }
 
-        public async Task AddProjectAsync(Project project)
+        public async Task<Project> AddProjectAsync(Project project)
         {
             _context.Projects.Add(project);
             await _context.SaveChangesAsync();
+            return project;
         }
 
-        public async Task UpdateProjectAsync(Project project)
+        public async Task<Project> UpdateProjectAsync(Project project)
         { 
             await _context.SaveChangesAsync();
+            return project;
         }
 
         public async Task DeleteProjectAsync(Project project)

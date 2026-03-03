@@ -1,6 +1,7 @@
 ﻿using System;
-using TimeSheet.Domain.Entities;
+using System.Threading.Tasks;
 using TimeSheet.Domain.Common.Models;
+using TimeSheet.Domain.Entities;
 
 namespace TimeSheet.Domain.Interfaces
 {
@@ -9,9 +10,9 @@ namespace TimeSheet.Domain.Interfaces
         Task<Client> FindClientByIdAsync(Guid id);
         Task<Client> FindClientByNameAsync(string name);
         Task<IEnumerable<Client>> FindAllClientsAsync();
-        Task AddClientAsync(Client client);
-        Task UpdateClientAsync(Client client);
-        Task DeleteClientAsync(Client client);
+        Task<Client> AddClientAsync(Client client);
+        Task<Client> UpdateClientAsync(Client client);
+        Task<Client> DeleteClientAsync(Client client);
         Task<PagedList<Client>> FindAllClientsPagedAsync(
                 int pageNumber,
                 int pageSize,

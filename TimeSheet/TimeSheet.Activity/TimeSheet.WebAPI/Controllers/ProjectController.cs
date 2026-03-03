@@ -4,10 +4,10 @@ using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Project;
 using TimeSheet.Application.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using TimeSheet.Domain.Entities.Enums;
 
 namespace TimeSheet.WebAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProjectController : ControllerBase
@@ -43,7 +43,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] ProjectRequestDTO ProjectRequestDTO)
         {
@@ -51,7 +51,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProject([FromBody] ProjectRequestDTO ProjectRequestDTO, Guid id)
         {
@@ -59,7 +59,7 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProject(Guid id)
         {

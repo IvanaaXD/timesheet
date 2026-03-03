@@ -9,20 +9,25 @@ using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Domain.Common.Models;
 using TimeSheet.Application.Common.DTOs;
-using TimeSheet.Application.Exceptions;
+using TimeSheet.Application.Common.Exceptions;
+using FluentValidation;
+using TimeSheet.Application.Validators;
+using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class ClientService : IClientService
+    public class ClientService : BaseService, IClientService
     {
         private readonly IClientRepository _clientRepository;
         private readonly ICountryRepository _countryRepository;
+        private readonly IValidator<ClientRequestDTO> _validator;
         private readonly IMapper _mapper;
 
-        public ClientService(IClientRepository clientRepository, ICountryRepository countryRepository, IMapper mapper)
+        public ClientService(IClientRepository clientRepository, ICountryRepository countryRepository, IValidator<ClientRequestDTO> validator, IMapper mapper)
         {
             _clientRepository = clientRepository;
             _countryRepository = countryRepository;
+            _validator = validator;
             _mapper = mapper;
         }
 
@@ -60,6 +65,8 @@ namespace TimeSheet.Application.Services
 
         public async Task<ClientDTO> CreateClientAsync(ClientRequestDTO clientRequestDTO)
         {
+            await ValidateAsync(_validator, clientRequestDTO);
+
             var existing = await _clientRepository.FindClientByNameAsync(clientRequestDTO.Name);
             if (existing != null)
                 throw new ConflictException($"Client with name '{clientRequestDTO.Name}' already exists.");
@@ -69,16 +76,15 @@ namespace TimeSheet.Application.Services
                 throw new NotFoundException($"Country with ID {clientRequestDTO.CountryId} not found.");
 
             var client = _mapper.Map<Client>(clientRequestDTO);
-            client.Id = Guid.NewGuid();
 
-            await _clientRepository.AddClientAsync(client);
-
-            var createdClient = await _clientRepository.FindClientByIdAsync(client.Id);
+            var createdClient = await _clientRepository.AddClientAsync(client);
             return _mapper.Map<ClientDTO>(createdClient);
         }
 
         public async Task<ClientDTO> UpdateClientAsync(Guid id, ClientRequestDTO clientRequestDTO)
         {
+            await ValidateAsync(_validator, clientRequestDTO);
+
             var existingClient = await _clientRepository.FindClientByIdAsync(id);
             if (existingClient == null) throw new NotFoundException($"Client with ID {id} not found.");
 
@@ -91,9 +97,7 @@ namespace TimeSheet.Application.Services
                 throw new NotFoundException($"Country with ID {clientRequestDTO.CountryId} not found.");
 
             _mapper.Map(clientRequestDTO, existingClient);
-            await _clientRepository.UpdateClientAsync(existingClient);
-
-            var updatedClient = await _clientRepository.FindClientByIdAsync(id);
+            var updatedClient = await _clientRepository.UpdateClientAsync(existingClient);
             return _mapper.Map<ClientDTO>(updatedClient);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using TimeSheet.Domain.Entities;
 
 namespace TimeSheet.Domain.Interfaces
@@ -8,7 +9,7 @@ namespace TimeSheet.Domain.Interfaces
         Task<Country> FindCountryByIdAsync(Guid id);
         Task<Country> FindCountryByNameAsync(string name);
         Task<IEnumerable<Country>> FindAllCountriesAsync();
-        Task AddCountryAsync(Country country);
-        Task UpdateCountryAsync(Country country);
+        Task<Country> AddCountryAsync(Country country);
+        Task<Country> UpdateCountryAsync(Country country);
     }
 }

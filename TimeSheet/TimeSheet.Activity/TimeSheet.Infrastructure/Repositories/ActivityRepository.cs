@@ -43,10 +43,11 @@ namespace TimeSheet.Infrastructure.Repositories
             return await GetActivitiesWithIncludes().AsNoTracking().ToListAsync();
         }
 
-        public async Task AddActivityAsync(Activity activity)
+        public async Task<Activity> AddActivityAsync(Activity activity)
         {
             _context.Activities.Add(activity);  
             await _context.SaveChangesAsync();
+            return activity;
         }
 
         public async Task<IEnumerable<Activity>> SearchActivitiesAsync(

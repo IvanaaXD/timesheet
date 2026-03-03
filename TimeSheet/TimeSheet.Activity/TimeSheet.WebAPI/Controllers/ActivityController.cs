@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using TimeSheet.Application.Abstractions;
 using TimeSheet.Application.DTOs.Activity;
 using Microsoft.AspNetCore.Authorization;
+using TimeSheet.Domain.Entities.Enums;
 
 namespace TimeSheet.WebAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ActivityController : ControllerBase
