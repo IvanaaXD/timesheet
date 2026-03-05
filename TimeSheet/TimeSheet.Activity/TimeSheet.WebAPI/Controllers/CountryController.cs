@@ -18,13 +18,13 @@ namespace TimeSheet.WebAPI.Controllers
             _countryService = countryService;
         }
 
-        [Authorize]
-        [HttpGet("id/{id}")]
-        public async Task<IActionResult> GetCountryById(Guid id)
-        {
-            var result = await _countryService.GetCountryByIdAsync(id);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpGet("id/{id}")]
+        //public async Task<IActionResult> GetCountryById(Guid id)
+        //{
+        //    var result = await _countryService.GetCountryByIdAsync(id);
+        //    return Ok(result);
+        //}
 
         [Authorize]
         [HttpGet("name/{name}")]

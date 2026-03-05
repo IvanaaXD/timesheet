@@ -12,11 +12,12 @@ using TimeSheet.Domain.Common.Models;
 using TimeSheet.Application.Common.Exceptions;
 using FluentValidation;
 using TimeSheet.Application.Validators;
+using TimeSheet.Application.Common.Extensions;
 using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class MemberService : BaseService, IMemberService
+    public class MemberService : IMemberService
     {
         private readonly IMemberRepository _memberRepository;
         private readonly IEmailService _emailService;
@@ -87,7 +88,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<MemberDTO> CreateMemberAsync(MemberRequestDTO memberRequestDTO)
         {
-            await ValidateAsync(_validator, memberRequestDTO);
+            await ValidateAndThrowAsync(_validator, memberRequestDTO);
 
             var existingUsername = await _memberRepository.FindMemberByUsernameAsync(memberRequestDTO.Username);
             if (existingUsername != null)
@@ -110,7 +111,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<MemberDTO> UpdateMemberAsync(Guid id, MemberRequestDTO memberRequestDTO)
         {
-            await ValidateAsync(_validator, memberRequestDTO);
+            await ValidateAndThrowAsync(_validator, memberRequestDTO);
 
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
             if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");

@@ -12,11 +12,12 @@ using TimeSheet.Application.Common.DTOs;
 using TimeSheet.Application.Common.Exceptions;
 using FluentValidation;
 using TimeSheet.Application.Validators;
+using TimeSheet.Application.Common.Extensions;
 using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class ClientService : BaseService, IClientService
+    public class ClientService : IClientService
     {
         private readonly IClientRepository _clientRepository;
         private readonly ICountryRepository _countryRepository;
@@ -65,7 +66,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<ClientDTO> CreateClientAsync(ClientRequestDTO clientRequestDTO)
         {
-            await ValidateAsync(_validator, clientRequestDTO);
+            await ValidateAndThrowAsync(_validator, clientRequestDTO);
 
             var existing = await _clientRepository.FindClientByNameAsync(clientRequestDTO.Name);
             if (existing != null)
@@ -83,7 +84,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<ClientDTO> UpdateClientAsync(Guid id, ClientRequestDTO clientRequestDTO)
         {
-            await ValidateAsync(_validator, clientRequestDTO);
+            await ValidateAndThrowAsync(_validator, clientRequestDTO);
 
             var existingClient = await _clientRepository.FindClientByIdAsync(id);
             if (existingClient == null) throw new NotFoundException($"Client with ID {id} not found.");

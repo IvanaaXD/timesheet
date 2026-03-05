@@ -33,33 +33,33 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpGet("username/{username}")]
-        public async Task<IActionResult> GetMemberByUsername(string username)
-        {
-            var result = await _memberService.GetMemberByUsernameAsync(username);
+        //[Authorize]
+        //[HttpGet("username/{username}")]
+        //public async Task<IActionResult> GetMemberByUsername(string username)
+        //{
+        //    var result = await _memberService.GetMemberByUsernameAsync(username);
 
-            if (result == null)
-            {
-                return NotFound(new { message = $"Member with username {username} not found." });
-            }
+        //    if (result == null)
+        //    {
+        //        return NotFound(new { message = $"Member with username {username} not found." });
+        //    }
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
-        [Authorize]
-        [HttpGet("email/{email}")]
-        public async Task<IActionResult> GetMemberByEmail(string email)
-        {
-            var result = await _memberService.GetMemberByEmailAsync(email);
+        //[Authorize]
+        //[HttpGet("email/{email}")]
+        //public async Task<IActionResult> GetMemberByEmail(string email)
+        //{
+        //    var result = await _memberService.GetMemberByEmailAsync(email);
 
-            if (result == null)
-            {
-                return NotFound(new { message = $"Member with email {email} not found." });
-            }
+        //    if (result == null)
+        //    {
+        //        return NotFound(new { message = $"Member with email {email} not found." });
+        //    }
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         [Authorize]
         [HttpGet]

@@ -9,12 +9,13 @@ using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
 using TimeSheet.Application.Common.Exceptions;
 using FluentValidation;
+using TimeSheet.Application.Common.Extensions;
 using TimeSheet.Application.Validators;
 using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class CategoryService : BaseService, ICategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IValidator<CategoryRequestDTO> _validator;
@@ -52,7 +53,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<CategoryDTO> CreateCategoryAsync(CategoryRequestDTO categoryRequestDTO)
         {
-            await ValidateAsync(_validator, categoryRequestDTO);
+            await ValidateAndThrowAsync(_validator, categoryRequestDTO);
 
             var existing = await _categoryRepository.FindCategoryByNameAsync(categoryRequestDTO.Name);
             if (existing != null)
@@ -66,7 +67,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<CategoryDTO> UpdateCategoryAsync(Guid id, CategoryRequestDTO categoryRequestDTO)
         {
-            await ValidateAsync(_validator, categoryRequestDTO);
+            await ValidateAndThrowAsync(_validator, categoryRequestDTO);
 
             var existingCategory = await _categoryRepository.FindCategoryByIdAsync(id);
             if (existingCategory == null)

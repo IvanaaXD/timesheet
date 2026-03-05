@@ -27,17 +27,17 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetClientByName(string name)
-        {
-            var result = await _clientService.GetClientByNameAsync(name);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpGet("name/{name}")]
+        //public async Task<IActionResult> GetClientByName(string name)
+        //{
+        //    var result = await _clientService.GetClientByNameAsync(name);
+        //    return Ok(result);
+        //}
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetAllCountries()
+        public async Task<IActionResult> GetAllClients()
         {
             var result = await _clientService.GetAllClientsAsync();
             return Ok(result);

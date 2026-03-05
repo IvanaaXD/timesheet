@@ -12,11 +12,12 @@ using TimeSheet.Application.Common.DTOs;
 using TimeSheet.Application.Common.Exceptions;
 using FluentValidation;
 using TimeSheet.Application.Validators;
+using TimeSheet.Application.Common.Extensions;
 using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class ProjectService : BaseService, IProjectService
+    public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
         private readonly IProjectLeadRepository _projectLeadRepository;
@@ -61,24 +62,12 @@ namespace TimeSheet.Application.Services
 
         public async Task<ProjectDTO> CreateProjectAsync(ProjectRequestDTO projectRequestDTO)
         {
-            await ValidateAsync(_validator, projectRequestDTO);
+            await ValidateAndThrowAsync(_validator, projectRequestDTO);
 
             var client = await _clientRepository.FindClientByIdAsync(projectRequestDTO.ClientId);
             if (client == null) throw new NotFoundException($"Client with ID {projectRequestDTO.ClientId} not found.");
 
-            var member = await _memberRepository.FindMemberByIdAsync(projectRequestDTO.CurrentLead);
-            if (member == null) throw new NotFoundException($"Member with ID {projectRequestDTO.CurrentLead} not found.");
-
             var project = _mapper.Map<Project>(projectRequestDTO);
-
-            if (projectRequestDTO.CurrentLead.HasValue)
-            {
-                var memberL = await _memberRepository.FindMemberByIdAsync(projectRequestDTO.CurrentLead.Value);
-                if (memberL == null) throw new NotFoundException("Member not found.");
-
-                project.CurrentLeadId = member.Id;
-                await _projectLeadRepository.AssignLeadAsync(project.Id, member.Id);
-            }
 
             var createdProject = await _projectRepository.AddProjectAsync(project);
             return _mapper.Map<ProjectDTO>(createdProject);
@@ -86,30 +75,25 @@ namespace TimeSheet.Application.Services
 
         public async Task<ProjectDTO> UpdateProjectAsync(Guid id, ProjectRequestDTO projectRequestDTO)
         {
-            await ValidateAsync(_validator, projectRequestDTO);
+            await ValidateAndThrowAsync(_validator, projectRequestDTO);
 
             var existingProject = await _projectRepository.FindProjectByIdAsync(id);
             if (existingProject == null) throw new NotFoundException($"Project with ID {id} not found.");
 
-            if (existingProject.CurrentLeadId != projectRequestDTO.CurrentLead)
-            {
-                var leadExists = await _memberRepository.FindMemberByIdAsync(projectRequestDTO.CurrentLead);
-                if (leadExists == null) throw new NotFoundException("New Lead member not found.");
-            }
-
             _mapper.Map(projectRequestDTO, existingProject);
+
             var updatedProject = await _projectRepository.UpdateProjectAsync(existingProject);
             return _mapper.Map<ProjectDTO>(updatedProject);
         }
 
-        public async Task ClearCurrentLeadAsync(Guid projectId)
-        {
-            var project = await _projectRepository.FindProjectByIdAsync(projectId);
-            if (project == null) throw new NotFoundException("Project not found.");
+        //public async Task ClearCurrentLeadAsync(Guid projectId)
+        //{
+        //    var project = await _projectRepository.FindProjectByIdAsync(projectId);
+        //    if (project == null) throw new NotFoundException("Project not found.");
 
-            project.CurrentLeadId = null; 
-            await _projectRepository.UpdateProjectAsync(project);
-        }
+        //    project.CurrentLeadId = null; 
+        //    await _projectRepository.UpdateProjectAsync(project);
+        //}
 
         public async Task DeleteProjectAsync(Guid id)
         {

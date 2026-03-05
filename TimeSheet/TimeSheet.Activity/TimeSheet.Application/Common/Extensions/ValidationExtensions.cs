@@ -3,13 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
-namespace TimeSheet.Application.Services
+namespace TimeSheet.Application.Common.Extensions
 {
-    public abstract class BaseService
+    public static class ValidationExtensions
     {
-        protected async Task ValidateAsync<T>(IValidator<T> validator, T dto)
+        public static async Task ValidateAndThrowAsync<T>(this IValidator<T> validator, T dto)
         {
             var result = await validator.ValidateAsync(dto);
+
             if (!result.IsValid)
             {
                 var errorMessages = string.Join(", ", result.Errors.Select(e => e.ErrorMessage));
@@ -18,4 +19,3 @@ namespace TimeSheet.Application.Services
         }
     }
 }
-

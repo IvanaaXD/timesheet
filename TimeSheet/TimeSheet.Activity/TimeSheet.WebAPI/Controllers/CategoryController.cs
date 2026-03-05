@@ -26,13 +26,13 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetCategoryByName(string name)
-        {
-            var result = await _categoryService.GetCategoryByNameAsync(name);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpGet("name/{name}")]
+        //public async Task<IActionResult> GetCategoryByName(string name)
+        //{
+        //    var result = await _categoryService.GetCategoryByNameAsync(name);
+        //    return Ok(result);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()

@@ -34,13 +34,13 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> GetAllActivities()
-        {
-            var result = await _activityService.GetAllActivitiesAsync();
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllActivities()
+        //{
+        //    var result = await _activityService.GetAllActivitiesAsync();
+        //    return Ok(result);
+        //}
 
         [Authorize]
         [HttpPost]
@@ -52,7 +52,7 @@ namespace TimeSheet.WebAPI.Controllers
 
         [Authorize]
         [HttpPost("search")]
-        public async Task<IActionResult> GetAllActivitiesS([FromBody] ReportQueryDTO reportQueryDTO)
+        public async Task<IActionResult> SearchAllActivities([FromBody] ReportQueryDTO reportQueryDTO)
         {
             var result = await _activityService.SearchActivitiesAsync(
                 reportQueryDTO.MemberId,

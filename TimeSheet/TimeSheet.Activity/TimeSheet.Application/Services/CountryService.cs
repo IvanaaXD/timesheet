@@ -10,11 +10,12 @@ using TimeSheet.Domain.Interfaces;
 using TimeSheet.Application.Common.Exceptions;
 using FluentValidation;
 using TimeSheet.Application.Validators;
+using TimeSheet.Application.Common.Extensions;
 using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class CountryService : BaseService, ICountryService
+    public class CountryService : ICountryService
     {
         private readonly ICountryRepository _countryRepository;
         private readonly IValidator<CountryRequestDTO> _validator;
@@ -51,7 +52,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<CountryDTO> CreateCountryAsync(CountryRequestDTO countryRequestDTO)
         {
-            await ValidateAsync(_validator, countryRequestDTO);
+            await ValidateAndThrowAsync(_validator, countryRequestDTO);
 
             var countryWithSameName = await _countryRepository.FindCountryByNameAsync(countryRequestDTO.Name);
             if (countryWithSameName != null)
@@ -65,7 +66,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<CountryDTO> UpdateCountryAsync(Guid id, CountryRequestDTO countryRequestDTO)
         {
-            await ValidateAsync(_validator, countryRequestDTO); 
+            await ValidateAndThrowAsync(_validator, countryRequestDTO); 
 
             var existingCountry = await _countryRepository.FindCountryByIdAsync(id);
             if (existingCountry == null) throw new NotFoundException($"Country with ID {id} not found.");

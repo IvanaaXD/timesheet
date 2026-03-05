@@ -62,6 +62,9 @@ namespace TimeSheet.Application.Services
             var isLead = await _projectLeadRepository.IsMemberLeadOfProjectAsync(memberId, projectId);
             if (!isLead) throw new NotFoundException($"Member with ID {memberId} does not lead the project with ID {projectId}");
 
+            project.CurrentLeadId = null;
+            await _projectRepository.UpdateProjectAsync(project);
+
             await _projectLeadRepository.RemoveLeadAsync(projectId, memberId);
         }
 

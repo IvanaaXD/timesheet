@@ -11,11 +11,12 @@ using TimeSheet.Domain.Entities.Enums;
 using TimeSheet.Application.Common.Exceptions;
 using FluentValidation;
 using TimeSheet.Application.Validators;
+using TimeSheet.Application.Common.Extensions;
 using TimeSheetValidationException = TimeSheet.Application.Common.Exceptions.ValidationException;
 
 namespace TimeSheet.Application.Services
 {
-    public class ActivityService : BaseService, IActivityService
+    public class ActivityService : IActivityService
     {
         private readonly IActivityRepository _activityRepository;
         private readonly ICurrentUserService _currentUserService;
@@ -54,7 +55,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<ActivityDTO> CreateActivityAsync(ActivityRequestDTO activityRequestDTO)
         {
-            await ValidateAsync(_validator, activityRequestDTO);
+            await ValidateAndThrowAsync(_validator, activityRequestDTO);
 
             var project = await _projectRepository.FindProjectByIdAsync(activityRequestDTO.ProjectId);
             if (project == null) throw new NotFoundException($"Project with ID {activityRequestDTO.ProjectId} not found.");
