@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TimeSheet.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace TimeSheet.WebAPI.Middleware;
 

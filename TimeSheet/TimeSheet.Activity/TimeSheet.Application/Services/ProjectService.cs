@@ -62,7 +62,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<ProjectDTO> CreateProjectAsync(ProjectRequestDTO projectRequestDTO)
         {
-            await ValidateAndThrowAsync(_validator, projectRequestDTO);
+            await _validator.ValidateAndThrowAsync(projectRequestDTO);
 
             var client = await _clientRepository.FindClientByIdAsync(projectRequestDTO.ClientId);
             if (client == null) throw new NotFoundException($"Client with ID {projectRequestDTO.ClientId} not found.");
@@ -75,7 +75,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<ProjectDTO> UpdateProjectAsync(Guid id, ProjectRequestDTO projectRequestDTO)
         {
-            await ValidateAndThrowAsync(_validator, projectRequestDTO);
+            await _validator.ValidateAndThrowAsync(projectRequestDTO);
 
             var existingProject = await _projectRepository.FindProjectByIdAsync(id);
             if (existingProject == null) throw new NotFoundException($"Project with ID {id} not found.");

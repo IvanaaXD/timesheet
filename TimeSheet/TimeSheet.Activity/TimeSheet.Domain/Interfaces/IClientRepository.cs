@@ -12,7 +12,7 @@ namespace TimeSheet.Domain.Interfaces
         Task<IEnumerable<Client>> FindAllClientsAsync();
         Task<Client> AddClientAsync(Client client);
         Task<Client> UpdateClientAsync(Client client);
-        Task<Client> DeleteClientAsync(Client client);
+        Task DeleteClientAsync(Client client);
         Task<PagedList<Client>> FindAllClientsPagedAsync(
                 int pageNumber,
                 int pageSize,

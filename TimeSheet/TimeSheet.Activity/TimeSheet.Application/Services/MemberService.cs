@@ -88,7 +88,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<MemberDTO> CreateMemberAsync(MemberRequestDTO memberRequestDTO)
         {
-            await ValidateAndThrowAsync(_validator, memberRequestDTO);
+            await _validator.ValidateAndThrowAsync(memberRequestDTO);
 
             var existingUsername = await _memberRepository.FindMemberByUsernameAsync(memberRequestDTO.Username);
             if (existingUsername != null)
@@ -111,7 +111,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<MemberDTO> UpdateMemberAsync(Guid id, MemberRequestDTO memberRequestDTO)
         {
-            await ValidateAndThrowAsync(_validator, memberRequestDTO);
+            await _validator.ValidateAndThrowAsync(memberRequestDTO);
 
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
             if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");

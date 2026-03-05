@@ -55,7 +55,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<ActivityDTO> CreateActivityAsync(ActivityRequestDTO activityRequestDTO)
         {
-            await ValidateAndThrowAsync(_validator, activityRequestDTO);
+            await _validator.ValidateAndThrowAsync(activityRequestDTO);
 
             var project = await _projectRepository.FindProjectByIdAsync(activityRequestDTO.ProjectId);
             if (project == null) throw new NotFoundException($"Project with ID {activityRequestDTO.ProjectId} not found.");

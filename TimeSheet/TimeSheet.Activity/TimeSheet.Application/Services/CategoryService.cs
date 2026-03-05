@@ -53,7 +53,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<CategoryDTO> CreateCategoryAsync(CategoryRequestDTO categoryRequestDTO)
         {
-            await ValidateAndThrowAsync(_validator, categoryRequestDTO);
+            await _validator.ValidateAndThrowAsync(categoryRequestDTO);
 
             var existing = await _categoryRepository.FindCategoryByNameAsync(categoryRequestDTO.Name);
             if (existing != null)
@@ -67,7 +67,7 @@ namespace TimeSheet.Application.Services
 
         public async Task<CategoryDTO> UpdateCategoryAsync(Guid id, CategoryRequestDTO categoryRequestDTO)
         {
-            await ValidateAndThrowAsync(_validator, categoryRequestDTO);
+            await _validator.ValidateAndThrowAsync(categoryRequestDTO);
 
             var existingCategory = await _categoryRepository.FindCategoryByIdAsync(id);
             if (existingCategory == null)

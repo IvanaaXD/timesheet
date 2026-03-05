@@ -17,9 +17,6 @@ namespace TimeSheet.Application.Validators
 
             RuleFor(x => x.ClientId)
                 .NotEmpty().WithMessage("You must select a client for this project.");
-
-            RuleFor(x => x.CurrentLead)
-                .NotEmpty().WithMessage("You must assign a lead to this project.");
         }
     }
 }
