@@ -8,7 +8,7 @@ namespace TimeSheet.Application.Abstractions
     public interface IActivityService
     {
         Task<ActivityDTO> GetActivityByIdAsync(Guid id);
-        Task<IEnumerable<ActivityDTO>> GetActivitiesByDateAsync(DateOnly date);
+        Task<ActivitySummaryDTO> GetActivitiesByDateAsync(DateOnly startDate, DateOnly endDate);
         Task<IEnumerable<ActivityDTO>> GetAllActivitiesAsync();
         Task<ActivityDTO> CreateActivityAsync(ActivityRequestDTO activity);
         //Task UpdateActivityAsync(Activity activity);

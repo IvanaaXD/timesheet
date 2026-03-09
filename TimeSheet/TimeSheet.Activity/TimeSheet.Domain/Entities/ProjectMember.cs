@@ -1,6 +1,6 @@
 ﻿namespace TimeSheet.Domain.Entities
 {
-    public class ProjectLead
+    public class ProjectMember
     {
         // Reationships
 
@@ -9,5 +9,7 @@
 
         public Guid ProjectId { get; set; }
         public virtual Project Project { get; set; }
+
+        public bool IsLead { get; set; } = false;
     }
 }

@@ -27,10 +27,10 @@ namespace TimeSheet.WebAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("date/{date}")]
-        public async Task<IActionResult> GetActivityByDate(DateOnly date)
+        [HttpGet("by-date")]
+        public async Task<IActionResult> GetActivitiesByDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
         {
-            var result = await _activityService.GetActivitiesByDateAsync(date);
+            var result = await _activityService.GetActivitiesByDateAsync(startDate, endDate);
             return Ok(result);
         }
 

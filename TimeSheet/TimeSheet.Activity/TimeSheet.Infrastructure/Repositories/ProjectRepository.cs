@@ -17,17 +17,24 @@ namespace TimeSheet.Infrastructure.Repositories
             _context = context;
         }
 
+        private IQueryable<Project> GetProjectsWithIncludes()
+        {
+            return _context.Projects
+                .Include(p => p.Client)
+                .Include(p => p.CurrentLead)
+                .Include(p => p.TeamMembers) 
+                    .ThenInclude(tm => tm.Member) 
+                .AsQueryable();
+        }
+
         public async Task<Project?> FindProjectByIdAsync(Guid id)
         {
-            return await _context.Projects
-                .Include(p => p.Client) 
-                .Include(p => p.CurrentLead) 
-                .FirstOrDefaultAsync(p => p.Id == id);
+            return await GetProjectsWithIncludes().FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<IEnumerable<Project>> FindAllProjectsAsync()
         {
-            return await _context.Projects.Include(p => p.Client).Include(p => p.CurrentLead).AsNoTracking().ToListAsync();
+            return await GetProjectsWithIncludes().AsNoTracking().ToListAsync();
         }
 
         public async Task<Project> AddProjectAsync(Project project)
@@ -38,7 +45,8 @@ namespace TimeSheet.Infrastructure.Repositories
         }
 
         public async Task<Project> UpdateProjectAsync(Project project)
-        { 
+        {
+            _context.Projects.Update(project);
             await _context.SaveChangesAsync();
             return project;
         }
@@ -56,7 +64,7 @@ namespace TimeSheet.Infrastructure.Repositories
             string? firstLetter,
             string order)
         {
-            var query = _context.Projects.Include(p => p.Client).Include(p => p.CurrentLead).AsNoTracking().AsQueryable();
+            var query = GetProjectsWithIncludes().AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {

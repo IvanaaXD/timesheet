@@ -59,7 +59,7 @@ builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IProjectLeadRepository, ProjectLeadRepository>();
+builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 builder.Services.AddScoped<IActivityService, ActivityService>();
@@ -68,7 +68,7 @@ builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
-builder.Services.AddScoped<IProjectLeadService, ProjectLeadService>();
+builder.Services.AddScoped<IProjectMemberService, ProjectMemberService>();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();

@@ -18,24 +18,32 @@ namespace TimeSheet.Infrastructure.Repositories
             _context = context;
         }
 
+        private IQueryable<Member> GetMembersWithIncludes()
+        {
+            return _context.Members
+                .Include(m => m.ProjectMemberships)
+                    .ThenInclude(pm => pm.Project) 
+                .AsQueryable();
+        }
+
         public async Task<Member> FindMemberByIdAsync(Guid id)
         {
-            return await _context.Members.FindAsync(id);
+            return await GetMembersWithIncludes().FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public async Task<Member> FindMemberByUsernameAsync(string username)
         {
-            return await _context.Members.FirstOrDefaultAsync(x => x.Username == username);
+            return await GetMembersWithIncludes().FirstOrDefaultAsync(x => x.Username == username);
         }
 
         public async Task<Member> FindMemberByEmailAsync(string email)
         {
-            return await _context.Members.FirstOrDefaultAsync(x => x.Email == email);
+            return await GetMembersWithIncludes().FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public async Task<IEnumerable<Member>> FindAllMembersAsync()
         {
-            return await _context.Members.AsNoTracking().ToListAsync();
+            return await GetMembersWithIncludes().AsNoTracking().ToListAsync();
         }
 
         public async Task<Member> AddMemberAsync(Member member)
@@ -47,6 +55,7 @@ namespace TimeSheet.Infrastructure.Repositories
 
         public async Task<Member> UpdateMemberAsync(Member member)
         {
+            _context.Members.Update(member);
             await _context.SaveChangesAsync();
             return member;
         }
@@ -75,7 +84,7 @@ namespace TimeSheet.Infrastructure.Repositories
             int pageSize,
             string order)
         {
-            var query = _context.Members.AsNoTracking().AsQueryable();
+            var query = GetMembersWithIncludes().AsNoTracking();
 
             query = order.ToLower() == "desc"
                 ? query.OrderByDescending(c => c.Name)

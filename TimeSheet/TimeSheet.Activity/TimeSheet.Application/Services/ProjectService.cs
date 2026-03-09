@@ -20,16 +20,16 @@ namespace TimeSheet.Application.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
-        private readonly IProjectLeadRepository _projectLeadRepository;
+        private readonly IProjectMemberRepository _projectMemberRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IMemberRepository _memberRepository;
         private readonly IValidator<ProjectRequestDTO> _validator;
         private readonly IMapper _mapper;
 
-        public ProjectService(IProjectRepository projectRepository, IProjectLeadRepository projectLeadRepository,IClientRepository clientRepository, IMemberRepository memberRepository, IValidator<ProjectRequestDTO> validator, IMapper mapper)
+        public ProjectService(IProjectRepository projectRepository, IProjectMemberRepository projectMemberRepository,IClientRepository clientRepository, IMemberRepository memberRepository, IValidator<ProjectRequestDTO> validator, IMapper mapper)
         {
             _projectRepository = projectRepository;
-            _projectLeadRepository = projectLeadRepository;
+            _projectMemberRepository = projectMemberRepository;
             _clientRepository = clientRepository;
             _memberRepository = memberRepository;
             _validator = validator;

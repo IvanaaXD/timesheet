@@ -15,10 +15,14 @@ namespace TimeSheet.Application.DTOs.Member
         public MemberStatus Status { get; set; }
         public MemberRole Role { get; set; }
 
+        // Relationships
+
+        public IEnumerable<string> ProjectNames { get; set; } = new List<string>();
+
         // Constructors
 
         public MemberDTO() { }
-        public MemberDTO(string name, string username, string email, string password, decimal hoursPerWeek, MemberStatus status, MemberRole role)
+        public MemberDTO(string name, string username, string email, decimal hoursPerWeek, MemberStatus status, MemberRole role)
         {
             Name = name;
             Username = username;

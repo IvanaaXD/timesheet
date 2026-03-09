@@ -20,6 +20,8 @@ namespace TimeSheet.Domain.Entities
         public Guid? CurrentLeadId { get; set; }
         public virtual Member? CurrentLead { get; set; }
 
+        public virtual ICollection<ProjectMember> TeamMembers { get; set; } = new List<ProjectMember>();
+
         // Constructors
 
         public Project() { }

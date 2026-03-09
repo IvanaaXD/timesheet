@@ -8,7 +8,10 @@ namespace TimeSheet.Application.Mappings
     {
         public MemberMappingProfile()
         {
-            CreateMap<Member, MemberDTO>();
+            CreateMap<Member, MemberDTO>()
+            .ForMember(dest => dest.ProjectNames,
+                        opt => opt.MapFrom(src => src.ProjectMemberships.Select(pm => pm.Project.Name)));
+
             CreateMap<MemberRequestDTO, Member>();
         }
     }

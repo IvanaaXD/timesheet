@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeSheet.Application.DTOs.Member;
 using TimeSheet.Application.Common.DTOs;
-using TimeSheet.Domain.Common.Models; // Gde se nalazi PagedList
-using TimeSheet.Domain.Entities;      // Gde se nalazi Member
+using TimeSheet.Domain.Common.Models; 
+using TimeSheet.Domain.Entities;     
 
 namespace TimeSheet.Application.Abstractions
 {

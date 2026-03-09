@@ -14,7 +14,8 @@ namespace TimeSheet.Application.DTOs.Project
         // Relationships
 
         public string ClientName { get; set; }
-        public string CurrentLeadName { get; set; }
+        public string? CurrentLeadName { get; set; }
+        public IEnumerable<string> TeamMembers { get; set; } = new List<string>();
 
         // Constructors
 

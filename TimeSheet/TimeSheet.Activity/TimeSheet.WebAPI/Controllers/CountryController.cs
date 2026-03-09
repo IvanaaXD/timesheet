@@ -42,20 +42,20 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = UserRoles.Admin)]
-        [HttpPost]
-        public async Task<IActionResult> CreateCountry([FromBody] CountryRequestDTO CountryRequestDTO)
-        {
-            var result = await _countryService.CreateCountryAsync(CountryRequestDTO);
-            return Ok(result);
-        }
+        //[Authorize(Roles = UserRoles.Admin)]
+        //[HttpPost]
+        //public async Task<IActionResult> CreateCountry([FromBody] CountryRequestDTO CountryRequestDTO)
+        //{
+        //    var result = await _countryService.CreateCountryAsync(CountryRequestDTO);
+        //    return Ok(result);
+        //}
 
-        [Authorize(Roles = UserRoles.Admin)]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> UpdateCountry([FromBody] CountryRequestDTO CountryRequestDTO, Guid id)
-        {
-            var result = await _countryService.UpdateCountryAsync(id, CountryRequestDTO);
-            return Ok(result);
-        }
+        //[Authorize(Roles = UserRoles.Admin)]
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> UpdateCountry([FromBody] CountryRequestDTO CountryRequestDTO, Guid id)
+        //{
+        //    var result = await _countryService.UpdateCountryAsync(id, CountryRequestDTO);
+        //    return Ok(result);
+        //}
     }
 }

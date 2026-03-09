@@ -39,7 +39,7 @@ namespace TimeSheet.Infrastructure.Data.Configurations
             builder.Property(m => m.Role)
                     .IsRequired();
 
-            builder.HasMany<ProjectLead>()
+            builder.HasMany<ProjectMember>()
                 .WithOne(pl => pl.Member)
                 .HasForeignKey(pl => pl.MemberId)
                 .OnDelete(DeleteBehavior.Cascade);

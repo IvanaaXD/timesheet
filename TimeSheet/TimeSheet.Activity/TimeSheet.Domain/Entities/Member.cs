@@ -17,7 +17,7 @@ namespace TimeSheet.Domain.Entities
 
         // Relationships
 
-        public virtual ICollection<ProjectLead> LeadingAssignments { get; set; }
+        public virtual ICollection<ProjectMember> ProjectMemberships { get; set; }
 
         // Constructors
 

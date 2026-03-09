@@ -41,10 +41,19 @@ namespace TimeSheet.Application.Services
             return _mapper.Map<ActivityDTO>(activity);
         }
 
-        public async Task<IEnumerable<ActivityDTO>> GetActivitiesByDateAsync(DateOnly date)
+        public async Task<ActivitySummaryDTO> GetActivitiesByDateAsync(DateOnly startDate, DateOnly endDate)
         {
-            var activities = await _activityRepository.FindActivitiesByDateAsync(date);
-            return _mapper.Map<IEnumerable<ActivityDTO>>(activities);
+            var activities = await _activityRepository.FindActivitiesByDateAsync(startDate, endDate);
+
+            var activityDTOs = _mapper.Map<IEnumerable<ActivityDTO>>(activities);
+
+            decimal total = activityDTOs.Sum(a => a.Time + a.OverTime);
+
+            return new ActivitySummaryDTO
+            {
+                Activities = activityDTOs,
+                TotalHours = total
+            };
         }
 
         public async Task<IEnumerable<ActivityDTO>> GetAllActivitiesAsync()

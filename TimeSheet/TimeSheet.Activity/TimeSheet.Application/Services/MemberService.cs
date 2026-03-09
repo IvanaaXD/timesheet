@@ -148,7 +148,7 @@ namespace TimeSheet.Application.Services
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);
             if (existingMember == null) throw new NotFoundException($"Member with ID {id} not found.");
 
-            if (existingMember.LeadingAssignments != null && existingMember.LeadingAssignments.Any())
+            if (existingMember.ProjectMemberships != null && existingMember.ProjectMemberships.Any())
                 throw new BadRequestException("Cannot delete member who is currently a Lead on one or more projects.");
 
             await _memberRepository.DeleteMemberAsync(existingMember);

@@ -33,9 +33,12 @@ namespace TimeSheet.Infrastructure.Repositories
             return await GetActivitiesWithIncludes().FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task<IEnumerable<Activity>> FindActivitiesByDateAsync(DateOnly date)
+        public async Task<IEnumerable<Activity>> FindActivitiesByDateAsync(DateOnly startDate, DateOnly endDate)
         {
-            return await GetActivitiesWithIncludes().Where(a => a.Date == date).AsNoTracking().ToListAsync();
+            return await GetActivitiesWithIncludes()
+                .Where(a => a.Date >= startDate && a.Date <= endDate)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Activity>> FindAllActivitiesAsync()
