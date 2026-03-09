@@ -10,16 +10,18 @@ namespace TimeSheet.Domain.Common.Models
         public int TotalPages { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
+        public string? FirstLetter { get; set; }
 
         public PagedList() { }
 
-        public PagedList(List<T> items, int count, int pageNumber, int pageSize)
+        public PagedList(List<T> items, int count, int pageNumber, int pageSize, string? firstLetter)
         {
             TotalCount = count;
             PageSize = pageSize;
             CurrentPage = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
             Items = items;
+            FirstLetter = firstLetter;
         }
     }
 }

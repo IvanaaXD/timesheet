@@ -73,7 +73,7 @@ namespace TimeSheet.Infrastructure.Repositories
 
             if (!string.IsNullOrWhiteSpace(firstLetter))
             {
-                query = query.Where(p => p.Name.StartsWith(firstLetter));
+                query = query.Where(c => c.Name.ToLower().StartsWith(firstLetter.ToLower()));
             }
 
             query = order.ToLower() == "desc"
@@ -85,7 +85,7 @@ namespace TimeSheet.Infrastructure.Repositories
                                    .Take(pageSize)
                                    .ToListAsync();
 
-            return new PagedList<Project>(items, totalCount, pageNumber, pageSize);
+            return new PagedList<Project>(items, totalCount, pageNumber, pageSize, firstLetter);
         }
     }
 }

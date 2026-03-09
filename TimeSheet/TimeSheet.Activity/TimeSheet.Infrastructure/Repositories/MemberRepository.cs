@@ -95,7 +95,7 @@ namespace TimeSheet.Infrastructure.Repositories
                                    .Take(pageSize)
                                    .ToListAsync();
 
-            return new PagedList<Member>(items, totalCount, pageNumber, pageSize);
+            return new PagedList<Member>(items, totalCount, pageNumber, pageSize, null);
         }
     }
 }

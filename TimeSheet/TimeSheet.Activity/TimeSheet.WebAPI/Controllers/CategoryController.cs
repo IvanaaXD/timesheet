@@ -34,27 +34,12 @@ namespace TimeSheet.WebAPI.Controllers
         //    return Ok(result);
         //}
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {
             var result = await _categoryService.GetAllCategoriesAsync();
             return Ok(result);
         }
-
-        //[Authorize(Roles = UserRoles.Admin)]
-        //[HttpPost]
-        //public async Task<IActionResult> CreateCategory([FromBody] CategoryRequestDTO categoryRequestDTO)
-        //{
-        //    var result = await _categoryService.CreateCategoryAsync(categoryRequestDTO);
-        //    return Ok(result);
-        //}
-
-        //[Authorize(Roles = UserRoles.Admin)]
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateCategory([FromBody] CategoryRequestDTO categoryRequestDTO, Guid id)
-        //{
-        //    var result = await _categoryService.UpdateCategoryAsync(id, categoryRequestDTO);
-        //    return Ok(result);
-        //}
     }
 }

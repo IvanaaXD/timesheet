@@ -25,6 +25,13 @@ namespace TimeSheet.WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+        {
+            var result = await _identityService.GenerateAccessTokenFromRefreshToken(request.RefreshToken, request.AccessToken);
+            return Ok(result);
+        }
+
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)

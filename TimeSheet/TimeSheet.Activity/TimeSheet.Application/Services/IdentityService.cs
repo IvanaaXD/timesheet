@@ -106,7 +106,7 @@ namespace TimeSheet.Application.Services
             return Convert.ToBase64String(randomNumber);
         }
 
-        public async Task<string> GenerateAccessTokenFromRefreshToken(string refreshToken,  string accessToken)
+        public async Task<AuthResponse> GenerateAccessTokenFromRefreshToken(string refreshToken,  string accessToken)
         {
             var principal = GetPrincipalFromExpiredToken(accessToken);
             var userId = principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -138,7 +138,13 @@ namespace TimeSheet.Application.Services
             newRefreshToken.MemberId = Guid.Parse(userId!);
             await _tokenRepository.SaveRefreshToken(newRefreshToken);
 
-            return newAccessToken;
+            return new AuthResponse
+            {
+                Id = Guid.Parse(userId!),
+                Username = username!,
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken.TokenString
+            };
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)

@@ -8,6 +8,7 @@ namespace TimeSheet.Application.Abstractions
     public interface IIdentityService
     {
         Task<AuthResponse> LoginAsync(LoginRequest request);
+        Task<AuthResponse> GenerateAccessTokenFromRefreshToken(string refreshToken, string accessToken);
         Task LogoutAsync(LogoutRequest request);
     }
 }

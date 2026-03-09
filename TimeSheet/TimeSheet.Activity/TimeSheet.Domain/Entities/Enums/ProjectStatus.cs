@@ -2,8 +2,8 @@
 {
     public enum ProjectStatus
     {
-        ACTIVE,
-        INACTIVE,
-        ARCHIVED
+        ACTIVE = 1,
+        INACTIVE = 2,
+        ARCHIVED = 3,
     }
 }
