@@ -1,0 +1,95 @@
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f3f3f3;
+    padding: 15px 25px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: #F36C21; 
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.nav-btn.disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.current-month-display {
+    font-size: 18px;
+    color: #555;
+    text-transform: capitalize;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border: 1px solid #e0e0e0;
+    background-color: #fff;
+}
+
+.calendar-day-header {
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #888;
+    font-size: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #fafafa;
+}
+
+.calendar-cell {
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.calendar-cell.empty {
+    background-color: #f9f9f9;
+}
+
+.day-number {
+    color: #999;
+    font-size: 14px;
+}
+
+.hours-display {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 5px;
+}
+
+.calendar-cell.editable-week {
+    background-color: #f0f9f0; 
+    border: 1px solid #c8e6c9;
+}
+
+.calendar-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+.total-hours {
+    font-size: 18px;
+    color: #666;
+}
+
+.total-hours span {
+    color: #F36C21;
+    font-weight: bold;
+    font-size: 22px;
+}

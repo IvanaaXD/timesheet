@@ -25,10 +25,12 @@ namespace TimeSheet.Application.Services
         private readonly IValidator<ActivityRequestDTO> _validator;
         private readonly IMapper _mapper;
 
-        public ActivityService(IActivityRepository activityRepository, ICurrentUserService currentUserService, IValidator<ActivityRequestDTO> validator, IMapper mapper)
+        public ActivityService(IActivityRepository activityRepository, ICurrentUserService currentUserService, IProjectRepository projectRepository, ICategoryRepository categoryRepository, IValidator<ActivityRequestDTO> validator, IMapper mapper)
         {
             _activityRepository = activityRepository;
             _currentUserService = currentUserService;
+            _projectRepository = projectRepository;
+            _categoryRepository = categoryRepository;
             _validator = validator;
             _mapper = mapper;
         }
@@ -90,6 +92,21 @@ namespace TimeSheet.Application.Services
             DateOnly? startDate,
             DateOnly? endDate)
         {
+            if (!startDate.HasValue || !endDate.HasValue)
+            {
+                throw new BadRequestException("Both start and end dates must be selected for the search.");
+            }
+
+            if (endDate.Value > startDate.Value.AddMonths(6))
+            {
+                throw new BadRequestException("The search range cannot exceed 6 months.");
+            }
+
+            if (endDate.Value < startDate.Value)
+            {
+                throw new TimeSheetValidationException("End date cannot be before start date.");
+            }
+
             var activities = await _activityRepository.SearchActivitiesAsync(
                 memberId: memberId,
                 clientId: clientId,
@@ -98,7 +115,8 @@ namespace TimeSheet.Application.Services
                 startDate: startDate,
                 endDate: endDate
             );
-            return _mapper.Map<IEnumerable<ActivityDTO>>(activities);  
+
+            return _mapper.Map<IEnumerable<ActivityDTO>>(activities);
         }
     }
 }

@@ -84,6 +84,32 @@ export const MembersPage: React.FC = () => {
         }
     };
 
+    const handleResetPassword = async (id: string) => {
+        if (!window.confirm("Are you sure you want to change the password for this member?")) return;
+        
+        try {
+            await memberService.updateMemberPassword(id);
+            
+            const userJson = localStorage.getItem('user');
+            const currentUser = userJson ? JSON.parse(userJson) : null;
+
+            if (currentUser && currentUser.id === id) {
+                alert("You have changed your own password. For security reasons, you will be logged out.");
+                
+                localStorage.removeItem('user');
+                localStorage.removeItem('token'); 
+                
+                window.location.href = '/login'; 
+            } else {
+                alert("Password changed successfully.");
+                setRefreshTrigger(prev => prev + 1);
+            }
+        } catch (error) {
+            console.error("Error resetting password:", error);
+            alert("Failed to change password.");
+        }
+    };
+
     return (
         <div className="page-container">
             <div className="page-header">
@@ -149,7 +175,7 @@ export const MembersPage: React.FC = () => {
                                     <div className="expanded-footer">
                                         <button className="btn-save" onClick={() => handleSave(member.id)}>Save</button>
                                         <button className="btn-delete" onClick={() => handleDelete(member.id)}>Delete</button>
-                                        <button className="btn-reset">Reset Password</button>
+                                        <button className="btn-reset" onClick={() => handleResetPassword(member.id)}>Reset Password</button>
                                     </div>
                                 </div>
                             ) : (

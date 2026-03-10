@@ -31,7 +31,6 @@ export const memberService = {
         return response.data;
     },
 
-
     updateMemberPassword: async (id: string): Promise<MemberDTO> => {
         const response = await api.put<MemberDTO>(`${BASE_URL}/password/${id}`);
         return response.data;

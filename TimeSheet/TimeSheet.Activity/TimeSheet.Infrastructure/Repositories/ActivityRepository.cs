@@ -21,6 +21,7 @@ namespace TimeSheet.Infrastructure.Repositories
         private IQueryable<Activity> GetActivitiesWithIncludes()
         {
             return _context.Activities
+                .IgnoreQueryFilters()
                 .Include(a => a.Member)
                 .Include(a => a.Category)
                 .Include(a => a.Project)
