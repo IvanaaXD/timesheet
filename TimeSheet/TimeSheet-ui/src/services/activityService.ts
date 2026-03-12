@@ -5,6 +5,7 @@ import {
     ActivitySummaryDTO, 
     ReportQueryDTO 
 } from '../types/activity';
+import { PagedResult } from '../types/common';
 
 const BASE_URL = '/api/Activity';
 
@@ -27,8 +28,8 @@ export const activityService = {
         return response.data;
     },
 
-    searchActivities: async (query: ReportQueryDTO): Promise<ActivityDTO[]> => {
-        const response = await api.post<ActivityDTO[]>(`${BASE_URL}/search`, query);
+    searchActivities: async (query: ReportQueryDTO): Promise<PagedResult<ActivityDTO>> => {
+        const response = await api.post<PagedResult<ActivityDTO>>(`${BASE_URL}/search`, query);
         return response.data;
     }
 };

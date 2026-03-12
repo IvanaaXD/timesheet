@@ -1,15 +1,41 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #444444;
+    --label-color: #666666;
+    --title-color: #333333;
+    --border-color: #eeeeee;
+    --input-border: #cccccc;
+    --card-bg: #f9f9f9;
+    --footer-bg: #f5f5f5;
+    --input-bg: #ffffff;
+    --table-border: #f1f1f1;
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1c !important;
+    --text-color: #d4d4d4 !important;
+    --label-color: #a0a0a0 !important;
+    --title-color: #ffffff !important;
+    --border-color: #333333 !important;
+    --input-border: #444444 !important;
+    --card-bg: #242426 !important;
+    --footer-bg: #2d2d30 !important;
+    --input-bg: #2a2a2d !important;
+    --table-border: #333333 !important;
+}
+
 .reports-container {
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
+    background-color: var(--bg-color) !important;
 }
 
-/* Filter sekcija */
 .filter-card {
-    background: #f9f9f9;
+    background: var(--card-bg) !important;
     padding: 25px;
     border-radius: 8px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border-color) !important;
     margin-bottom: 30px;
 }
 
@@ -27,13 +53,15 @@
 
 .filter-group label {
     font-size: 14px;
-    color: #666;
+    color: var(--label-color) !important;
     font-weight: 600;
 }
 
 .filter-group select, .filter-group input {
     padding: 10px;
-    border: 1px solid #ccc;
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
     border-radius: 4px;
     font-size: 14px;
 }
@@ -45,7 +73,6 @@
     margin-top: 25px;
 }
 
-/* Dugmići prate tvoj brend */
 .search-btn {
     background-color: #4CAF50;
     color: white;
@@ -66,7 +93,6 @@
     font-weight: 600;
 }
 
-/* Tabela */
 .reports-table {
     width: 100%;
     border-collapse: collapse;
@@ -76,44 +102,44 @@
 .reports-table th {
     text-align: left;
     color: #F36C21;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--border-color) !important;
     padding: 12px 10px;
     font-size: 15px;
 }
 
 .reports-table td {
     padding: 12px 10px;
-    border-bottom: 1px solid #f1f1f1;
-    color: #444;
+    border-bottom: 1px solid var(--table-border) !important;
+    color: var(--text-color) !important;
     font-size: 14px;
 }
 
 .text-right { text-align: right; }
 
-/* Footer i Export */
 .reports-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f5f5f5;
+    background: var(--footer-bg) !important;
     padding: 20px;
     border-radius: 4px;
+    border: 1px solid var(--border-color) !important;
 }
 
 .export-btn {
-    background: white;
-    border: 1px solid #ccc;
+    background: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
     padding: 8px 15px;
     margin-right: 10px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
-    color: #666;
+    color: var(--label-color) !important;
 }
 
 .export-btn:hover {
-    border-color: #F36C21;
-    color: #F36C21;
+    border-color: #F36C21 !important;
+    color: #F36C21 !important;
 }
 
 .report-total {
@@ -128,27 +154,84 @@
     margin-left: 10px;
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 30px 0;
+}
+
+.page-btn {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    padding: 8px 16px;
+    color: var(--text-color) !important;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+    background-color: var(--footer-bg) !important;
+    border-color: #F36C21 !important;
+    color: #F36C21 !important;
+}
+
+.page-btn:disabled {
+    color: #666 !important;
+    cursor: not-allowed;
+    background-color: var(--card-bg) !important;
+    opacity: 0.5;
+}
+
+.page-info {
+    padding: 8px 15px;
+    color: var(--label-color) !important;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.export-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.export-range-selector {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+    color: var(--text-color) !important;
+    background: var(--input-bg) !important;
+    padding: 10px;
+    border: 1px solid var(--input-border) !important;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.export-range-selector span {
+    font-weight: bold;
+    color: #F36C21;
+}
+
+.export-range-selector label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.export-range-selector input[type="radio"] {
+    accent-color: #F36C21;
+}
+
 @media print {
-    .filter-card, 
-    .export-actions, 
-    .nav-arrow,
-    .page-header,
-    button {
+    .filter-card, .export-actions, .nav-arrow, .page-header, .pagination, button {
         display: none !important;
     }
-
-    .reports-container {
-        width: 100%;
-        padding: 0;
-        margin: 0;
-    }
-
-    .reports-table {
-        border: 1px solid #000;
-    }
-
-    .page-title {
-        text-align: center;
-        margin-bottom: 20px;
-    }
+    .reports-container { width: 100%; padding: 0; margin: 0; }
+    .reports-table { border: 1px solid #000; }
 }

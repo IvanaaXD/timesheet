@@ -1,24 +1,44 @@
+:root {
+    --modal-bg: #ffffff;
+    --modal-text: #333333;
+    --modal-label: #666666;
+    --modal-border: #eeeeee;
+    --modal-overlay: rgba(0, 0, 0, 0.5);
+    --input-bg: #ffffff;
+    --input-border: #dddddd;
+}
+
+body.dark-mode {
+    --modal-bg: #242426 !important;
+    --modal-text: #ffffff !important;
+    --modal-label: #d4d4d4 !important;
+    --modal-border: #333333 !important;
+    --modal-overlay: rgba(0, 0, 0, 0.8) !important;
+    --input-bg: #2a2a2d !important;
+    --input-border: #444444 !important;
+}
+
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    backdrop-filter: blur(2px);
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: var(--modal-overlay) !important; 
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 2000 !important;
+    backdrop-filter: blur(2px) !important;
 }
 
 .modal-content {
-    background-color: white;
-    width: 500px;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    overflow: hidden;
-    animation: slideIn 0.3s ease-out;
+    background-color: var(--modal-bg) !important;
+    width: 550px !important; 
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    overflow: hidden !important;
+    animation: slideIn 0.3s ease-out !important;
 }
 
 @keyframes slideIn {
@@ -27,65 +47,84 @@
 }
 
 .modal-header {
-    padding: 20px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
+    padding: 20px 25px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 1px solid var(--modal-border) !important;
+    background-color: var(--modal-bg) !important;
 }
 
 .modal-header h2 {
-    margin: 0;
-    font-size: 22px;
-    color: #333;
+    margin: 0 !important;
+    font-size: 22px !important;
+    color: var(--modal-text) !important;
 }
 
 .close-x-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: #999;
-    cursor: pointer;
+    background: none !important;
+    border: none !important;
+    font-size: 20px !important;
+    color: #999 !important;
+    cursor: pointer !important;
 }
 
 .modal-form {
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    padding: 25px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    background-color: var(--modal-bg) !important;
 }
 
-.modal-footer {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
+.modal-form .input-group {
+    display: grid !important;
+    grid-template-columns: 140px 1fr !important;
+    align-items: center !important;
+    gap: 15px !important;
 }
 
 .modal-form .input-group label {
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #666;
+    font-size: 14px !important;
+    color: var(--modal-label) !important;
+    margin: 0 !important;
+    text-align: left !important;
 }
 
-.modal-form input, .modal-form select {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    outline: none;
+.modal-form input, 
+.modal-form select {
+    padding: 10px !important;
+    background-color: var(--input-bg) !important;
+    color: var(--modal-text) !important;
+    border: 1px solid var(--input-border) !important;
+    border-radius: 4px !important;
+    outline: none !important;
+    width: 100% !important;
 }
 
 .modal-form input:focus {
-    border-color: #F36C21;
+    border-color: #F36C21 !important;
+}
+
+.modal-footer {
+    margin-top: 10px !important;
+    display: flex !important;
+    justify-content: flex-end !important; 
+    padding: 15px 25px !important;
+    border-top: 1px solid var(--modal-border) !important;
+    background-color: var(--modal-bg) !important;
 }
 
 .btn-save {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 40px;
-    border-radius: 4px;
-    font-weight: 600;
-    cursor: pointer;
+    background-color: #4CAF50 !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 40px !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+}
+
+.btn-save:hover {
+    background-color: #43a047 !important;
 }

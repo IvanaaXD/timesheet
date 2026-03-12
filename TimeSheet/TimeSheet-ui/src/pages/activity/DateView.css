@@ -1,9 +1,36 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #444444;
+    --title-color: #333333;
+    --header-bg: #eeeeee;
+    --border-color: #dddddd;
+    --input-bg: #ffffff;
+    --input-border: #cccccc;
+    --day-item-bg: #ffffff;
+    --locked-bg: #f9f9f9;
+    --secondary-text: #888888;
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1c !important;
+    --text-color: #d4d4d4 !important;
+    --title-color: #ffffff !important;
+    --header-bg: #2d2d30 !important;
+    --border-color: #333333 !important;
+    --input-bg: #2a2a2d !important;
+    --input-border: #444444 !important;
+    --day-item-bg: #242426 !important;
+    --locked-bg: #1e1e20 !important;
+    --secondary-text: #999999 !important;
+}
+
 .date-view-container {
     padding: 20px;
+    background-color: var(--bg-color) !important;
 }
 
 .daily-header {
-    background-color: #eee;
+    background-color: var(--header-bg) !important;
     padding: 15px;
     display: flex;
     justify-content: space-between;
@@ -15,7 +42,7 @@
 .nav-link {
     background: none;
     border: none;
-    color: #F36C21;
+    color: #F36C21 !important;
     cursor: pointer;
     font-weight: 600;
 }
@@ -28,27 +55,29 @@
 .activities-table th {
     text-align: left;
     padding: 10px;
-    color: #F36C21;
-    border-bottom: 2px solid #ddd;
+    color: #F36C21 !important;
+    border-bottom: 2px solid var(--border-color) !important;
     font-size: 14px;
 }
 
 .activities-table td {
     padding: 8px 5px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color) !important;
 }
 
 .activities-table input, .activities-table select {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
     border-radius: 3px;
 }
 
 .readonly-input {
-    background-color: #f9f9f9;
+    background-color: var(--locked-bg) !important;
     border: none !important;
-    color: #666;
+    color: var(--secondary-text) !important;
 }
 
 .table-actions {
@@ -59,7 +88,7 @@
 }
 
 .add-row-link {
-    color: #F36C21;
+    color: #F36C21 !important;
     background: none;
     border: none;
     font-weight: 600;
@@ -69,45 +98,21 @@
 
 .total-display {
     font-size: 16px;
-    color: #888;
+    color: var(--secondary-text) !important;
 }
 
 .total-display strong {
-    color: #F36C21;
+    color: #F36C21 !important;
     font-size: 18px;
 }
 
-.view-footer {
-    margin-top: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.back-to-monthly {
-    background: none;
-    border: none;
-    color: #F36C21;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.submit-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 30px;
-    border-radius: 4px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
+/* WEEK NAVIGATION */
 .week-navigation-header {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
-    background-color: #f5f5f5;
+    background-color: var(--header-bg) !important;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 25px;
@@ -123,8 +128,8 @@
     flex-direction: column;
     align-items: center;
     padding: 10px 15px;
-    background: white;
-    border: 2px solid transparent;
+    background: var(--day-item-bg) !important;
+    border: 2px solid transparent !important;
     border-radius: 5px;
     cursor: pointer;
     min-width: 60px;
@@ -132,27 +137,27 @@
 }
 
 .day-item.selected {
-    border-color: #F36C21;
-    background-color: white;
+    border-color: #F36C21 !important;
+    background-color: var(--day-item-bg) !important;
 }
 
 .day-name {
     font-size: 11px;
-    color: #999;
+    color: var(--secondary-text) !important;
     font-weight: bold;
 }
 
 .day-date {
     font-size: 18px;
     font-weight: bold;
-    color: #333;
+    color: var(--title-color) !important;
 }
 
 .nav-arrow {
     background: none;
     border: none;
     font-size: 24px;
-    color: #F36C21;
+    color: #F36C21 !important;
     cursor: pointer;
 }
 
@@ -161,58 +166,44 @@
     display: flex;
     justify-content: space-between; 
     align-items: center;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-color) !important;
     padding-top: 20px;
 }
 
-.footer-left {
-    flex: 1;
-}
-
-.footer-right {
-    flex: 1;
-    text-align: right; 
-}
-
-.total-display {
-    font-size: 16px;
-    color: #666;
-}
-
-.total-display strong {
-    color: #F36C21;
-    font-size: 20px;
-    margin-left: 10px;
+.back-to-monthly {
+    background: none;
+    border: none;
+    color: #F36C21 !important;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .submit-btn {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #4CAF50 !important;
+    color: white !important;
     border: none;
     padding: 10px 30px;
     border-radius: 4px;
+    font-weight: 600;
     cursor: pointer;
 }
 
 .row-locked {
-    background-color: #f9f9f9;
-    opacity: 0.7;
+    background-color: var(--locked-bg) !important;
+    opacity: 0.8 !important;
 }
 
 .row-locked input, .row-locked select {
-    cursor: not-allowed;
-    background: transparent;
-    border-color: transparent;
+    cursor: not-allowed !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    color: var(--secondary-text) !important;
 }
 
 .week-range-display {
     text-align: center;
     font-size: 16px;
     font-weight: 600;
-    color: #555;
+    color: var(--text-color) !important;
     margin-bottom: 15px;
-}
-
-.week-range-display::after {
-    color: #F36C21;
 }

@@ -33,4 +33,6 @@ export interface ReportQueryDTO {
     categoryId?: string | null;
     startDate?: string | null; 
     endDate?: string | null;  
+    pageNumber: number;
+    pageSize: number;
 }

@@ -7,6 +7,7 @@ using TimeSheet.Application.DTOs.Activity;
 using TimeSheet.Application.Mappings;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
+using TimeSheet.Domain.Common.Models;
 using TimeSheet.Domain.Entities.Enums;
 using TimeSheet.Application.Common.Exceptions;
 using FluentValidation;
@@ -84,13 +85,15 @@ namespace TimeSheet.Application.Services
             return _mapper.Map<ActivityDTO>(createdActivity);
         }
 
-        public async Task<IEnumerable<ActivityDTO>> SearchActivitiesAsync(
+        public async Task<PagedList<ActivityDTO>> SearchActivitiesAsync(
             Guid? memberId,
             Guid? clientId,
             Guid? projectId,
             Guid? categoryId,
             DateOnly? startDate,
-            DateOnly? endDate)
+            DateOnly? endDate,
+            int pageNumber,
+            int pageSize)  
         {
             if (!startDate.HasValue || !endDate.HasValue)
             {
@@ -107,16 +110,29 @@ namespace TimeSheet.Application.Services
                 throw new TimeSheetValidationException("End date cannot be before start date.");
             }
 
-            var activities = await _activityRepository.SearchActivitiesAsync(
+            var pagedActivities = await _activityRepository.SearchActivitiesAsync(
                 memberId: memberId,
                 clientId: clientId,
                 projectId: projectId,
                 categoryId: categoryId,
                 startDate: startDate,
-                endDate: endDate
+                endDate: endDate,
+                pageNumber: pageNumber,
+                pageSize: pageSize
             );
 
-            return _mapper.Map<IEnumerable<ActivityDTO>>(activities);
+            // 1. Mapiramo items u Listu (da ispoštujemo tip List<T> u konstruktoru)
+            var mappedItems = _mapper.Map<List<ActivityDTO>>(pagedActivities.Items);
+
+            // 2. KORISTIMO KONSTRUKTOR (Ovo rešava sve errore)
+            // Redosled iz tvog Assembly-ja: (items, count, pageNumber, pageSize, firstLetter)
+            return new PagedList<ActivityDTO>(
+                mappedItems,
+                pagedActivities.TotalCount,
+                pagedActivities.CurrentPage, // Koristimo CurrentPage jer PageIndex ne postoji
+                pagedActivities.PageSize,
+                null // FirstLetter stavljamo null jer nam ovde ne treba
+            );
         }
     }
 }

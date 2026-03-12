@@ -60,7 +60,9 @@ namespace TimeSheet.WebAPI.Controllers
                 reportQueryDTO.ProjectId,
                 reportQueryDTO.CategoryId,
                 reportQueryDTO.StartDate,
-                reportQueryDTO.EndDate);
+                reportQueryDTO.EndDate,
+                reportQueryDTO.PageNumber,
+                reportQueryDTO.PageSize);
             return Ok(result);
         }
     }

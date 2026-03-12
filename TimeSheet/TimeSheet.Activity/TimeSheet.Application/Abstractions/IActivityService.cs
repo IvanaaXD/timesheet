@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeSheet.Application.DTOs.Activity;
+using TimeSheet.Domain.Common.Models;
 
 namespace TimeSheet.Application.Abstractions
 {
@@ -13,13 +14,15 @@ namespace TimeSheet.Application.Abstractions
         Task<ActivityDTO> CreateActivityAsync(ActivityRequestDTO activity);
         //Task UpdateActivityAsync(Activity activity);
         //Task DeleteActivityAsync(Activity activity);
-        Task<IEnumerable<ActivityDTO>> SearchActivitiesAsync(
+        Task<PagedList<ActivityDTO>> SearchActivitiesAsync(
             Guid? memberId,
             Guid? clientId,
             Guid? projectId,
             Guid? categoryId,
             DateOnly? startDate,
-            DateOnly? endDate);
+            DateOnly? endDate,
+            int pageNumber,
+            int pageSize);
     }
 }
 

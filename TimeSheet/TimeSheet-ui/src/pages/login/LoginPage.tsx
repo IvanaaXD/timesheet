@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import './LoginPage.css';
@@ -11,6 +11,21 @@ export const LoginPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Proveravamo inicijalno stanje teme sa body elementa
+    const [isDarkMode, setIsDarkMode] = useState(() => 
+        document.body.classList.contains('dark-mode')
+    );
+
+    const toggleTheme = () => {
+        const newMode = !isDarkMode;
+        setIsDarkMode(newMode);
+        if (newMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    };
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -18,7 +33,6 @@ export const LoginPage: React.FC = () => {
 
         try {
             await authService.login({ username, password });
-            
             navigate('/');
         } catch (err: any) {
             setError('Pogrešan email ili lozinka. Pokušajte ponovo.');
@@ -30,6 +44,11 @@ export const LoginPage: React.FC = () => {
 
     return (
         <div className="login-page-container">
+            {/* Dugme za promenu teme u gornjem desnom uglu */}
+            <button className="theme-toggle-btn" onClick={toggleTheme}>
+                {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+            </button>
+
             <div className="background-glow"></div>
 
             <div className="login-content">
@@ -72,7 +91,7 @@ export const LoginPage: React.FC = () => {
                             <div className="actions">
                                 <a href="#" className="forgot-password">Forgot password?</a>
                                 <button type="submit" className="login-button" disabled={isLoading}>
-                                    {isLoading ? 'Logovanje...' : 'Login'}
+                                    {isLoading ? 'Logging in...' : 'Login'}
                                 </button>
                             </div>
                         </div>

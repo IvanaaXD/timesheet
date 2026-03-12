@@ -1,17 +1,24 @@
 import api from '../config/axios';
 import { AuthResponse, LoginRequest, LogoutRequest } from '../types/auth';
+import { getUserRole } from '../utils/authUtils';
 
 const BASE_URL = '/api/Auth';
 
 export const authService = {
-
     login: async (data: LoginRequest): Promise<AuthResponse> => {
         const response = await api.post<AuthResponse>(`${BASE_URL}/login`, data);
         
         if (response.data.accessToken) {
             localStorage.setItem('accessToken', response.data.accessToken);
             localStorage.setItem('refreshToken', response.data.refreshToken);
-            localStorage.setItem('user', JSON.stringify({ id: response.data.id, username: response.data.username }));
+            
+            const role = getUserRole(); 
+
+            localStorage.setItem('user', JSON.stringify({ 
+                id: response.data.id, 
+                username: response.data.username,
+                role: role 
+            }));
         }
         
         return response.data;

@@ -4,10 +4,13 @@ import { ClientDTO, ClientRequestDTO } from '../../types/client';
 import { countryService } from '../../services/countryService';
 import { CountryDTO } from '../../types/country';
 import './ClientsPage.css';
-import { CreateClientModal } from './/CreateClientModal';
+import { CreateClientModal } from './CreateClientModal';
+import { isAdmin as checkAdminStatus } from '../../utils/authUtils';
 
 export const ClientsPage: React.FC = () => {
 
+    const isAdmin = checkAdminStatus();
+    
     const [clients, setClients] = useState<ClientDTO[]>([]);
     const [countries, setCountries] = useState<CountryDTO[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -95,12 +98,14 @@ export const ClientsPage: React.FC = () => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        if (!isAdmin) return;
+
         const { name, value } = e.target;
         setEditFormData(prev => prev ? { ...prev, [name]: value } : null);
     };
 
     const handleSave = async (id: string) => {
-        if (!editFormData) return;
+        if (!editFormData || !isAdmin) return;
         
         try {
             await clientService.updateClient(id, editFormData);
@@ -113,6 +118,7 @@ export const ClientsPage: React.FC = () => {
     };
 
     const handleDelete = async (id: string, event?: React.MouseEvent) => {
+        if (!isAdmin) return;
         if (event) event.stopPropagation(); 
         
         const confirmed = window.confirm("Are you sure you want to delete this client?");
@@ -128,16 +134,19 @@ export const ClientsPage: React.FC = () => {
         }
     };
 
-return (
+    return (
         <div className="page-container">
             <div className="page-header">
                 <h1 className="page-title">Clients</h1>
             </div>
 
             <div className="top-controls">
-                <button className="create-btn" onClick={() => setIsCreateModalOpen(true)}>
-                    + Create new client
-                </button>
+                {isAdmin && (
+                    <button className="create-btn" onClick={() => setIsCreateModalOpen(true)}>
+                        + Create new client
+                    </button>
+                )}
+                
                 <div className="search-box">
                     <input 
                         type="text" 
@@ -184,7 +193,6 @@ return (
                                     <div 
                                         className="expanded-header" 
                                         onClick={() => setExpandedClientId(null)}
-                                        style={{ cursor: 'pointer' }}
                                     >
                                         <span className="client-name">{client.name}</span>
                                         <button className="close-expand-btn">✕</button>
@@ -192,7 +200,6 @@ return (
                                     
                                     <div className="expanded-body">
                                         <div className="form-grid">
-                                            {/* Name Input */}
                                             <div className="input-group">
                                                 <label>Client name:</label>
                                                 <input 
@@ -200,10 +207,10 @@ return (
                                                     name="name"
                                                     value={editFormData?.name || ''} 
                                                     onChange={handleInputChange}
+                                                    readOnly={!isAdmin} 
                                                 />
                                             </div>
                                             
-                                            {/* Address Input */}
                                             <div className="input-group">
                                                 <label>Address:</label>
                                                 <input 
@@ -211,10 +218,10 @@ return (
                                                     name="address"
                                                     value={editFormData?.address || ''} 
                                                     onChange={handleInputChange}
+                                                    readOnly={!isAdmin}
                                                 />
                                             </div>
                                             
-                                            {/* City Input */}
                                             <div className="input-group">
                                                 <label>City:</label>
                                                 <input 
@@ -222,10 +229,10 @@ return (
                                                     name="city"
                                                     value={editFormData?.city || ''} 
                                                     onChange={handleInputChange}
+                                                    readOnly={!isAdmin}
                                                 />
                                             </div>
                                             
-                                            {/* Zip Input */}
                                             <div className="input-group">
                                                 <label>Zip/Postal code:</label>
                                                 <input 
@@ -233,16 +240,17 @@ return (
                                                     name="zip"
                                                     value={editFormData?.zip || ''} 
                                                     onChange={handleInputChange}
+                                                    readOnly={!isAdmin}
                                                 />
                                             </div>
                                             
-                                            {/* Country Select */}
                                             <div className="input-group">
                                                 <label>Country:</label>
                                                 <select 
                                                     name="countryId"
                                                     value={editFormData?.countryId || ''}
                                                     onChange={handleInputChange}
+                                                    disabled={!isAdmin} 
                                                 >
                                                     <option value="" disabled>Select country</option>
                                                     {countries.map((country) => (
@@ -255,10 +263,12 @@ return (
                                         </div>
                                     </div>
 
-                                    <div className="expanded-footer">
-                                        <button className="btn-save" onClick={() => handleSave(client.id)}>Save</button>
-                                        <button className="btn-delete" onClick={() => handleDelete(client.id)}>Delete</button>
-                                    </div>
+                                    {isAdmin && (
+                                        <div className="expanded-footer">
+                                            <button className="btn-save" onClick={() => handleSave(client.id)}>Save</button>
+                                            <button className="btn-delete" onClick={() => handleDelete(client.id)}>Delete</button>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="client-card" onClick={() => toggleExpand(client)}>
@@ -283,7 +293,7 @@ return (
                     Previous
                 </button>
                 
-                <span className="page-info" style={{ padding: '8px 15px', color: '#555' }}>
+                <span className="page-info">
                     Page {totalPages === 0 ? 0 : pageNumber} of {totalPages}
                 </span>
                 
@@ -298,3 +308,4 @@ return (
         </div>
     );
 };
+

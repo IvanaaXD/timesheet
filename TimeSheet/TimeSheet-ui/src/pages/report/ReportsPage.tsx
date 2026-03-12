@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { activityService } from '../../services/activityService';
 import { projectService } from '../../services/projectService';
 import { categoryService } from '../../services/categoryService';
@@ -14,9 +14,14 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { robotoBase64 } from './fonts/robotoBase64';
 import './ReportsPage.css';
-
+import { isAdmin as checkAdminStatus } from '../../utils/authUtils';
 
 export const ReportsPage: React.FC = () => {
+
+    const isUserAdmin = checkAdminStatus();
+    const userJson = localStorage.getItem('user');
+    const currentUser = userJson ? JSON.parse(userJson) : null;
+
     const [reportData, setReportData] = useState<ActivityDTO[]>([]);
     const [projects, setProjects] = useState<ProjectDTO[]>([]);
     const [categories, setCategories] = useState<CategoryDTO[]>([]);
@@ -24,14 +29,21 @@ export const ReportsPage: React.FC = () => {
     const [members, setMembers] = useState<MemberDTO[]>([]); 
     const [isLoading, setIsLoading] = useState(false);
 
+    const [pageNumber, setPageNumber] = useState<number>(1);
+    const [pageSize] = useState<number>(10); 
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [totalCount, setTotalCount] = useState<number>(0);
+
     const [filters, setFilters] = useState({
-        teamMemberId: '', 
+        teamMemberId: isUserAdmin ? '' : (currentUser?.id || ''), 
         clientId: '',
         projectId: '',
         categoryId: '',
         startDate: '',
         endDate: ''
     });
+
+    const [exportRange, setExportRange] = useState<'current' | 'all'>('current');
 
     useEffect(() => {
         const fetchMetadata = async () => {
@@ -47,42 +59,56 @@ export const ReportsPage: React.FC = () => {
                 setClients(cl);
                 setMembers(m);
             } catch (err) {
-                console.error("Greška pri učitavanju metapodataka", err);
+                console.error("Error loading metadata", err);
             }
         };
         fetchMetadata();
     }, []);
 
-    const handleSearch = async () => {
+    const fetchData = useCallback(async (isNewSearch: boolean = false) => {
         if (!filters.startDate || !filters.endDate) {
-            alert("Please select both start and end dates.");
+            if (isNewSearch) alert("Please select both start and end dates.");
             return;
         }
 
         setIsLoading(true);
         try {
+            const activePage = isNewSearch ? 1 : pageNumber;
+            if (isNewSearch) setPageNumber(1);
+
             const query: ReportQueryDTO = {
                 memberId: filters.teamMemberId || null,
                 clientId: filters.clientId || null,
                 projectId: filters.projectId || null,
                 categoryId: filters.categoryId || null,
                 startDate: filters.startDate,
-                endDate: filters.endDate
+                endDate: filters.endDate,
+                pageNumber: activePage,
+                pageSize: pageSize
             };
 
-            const data = await activityService.searchActivities(query);
-            setReportData(data);
+            const response = await activityService.searchActivities(query);
+            setReportData(response.items || []);
+            setTotalCount(response.totalCount || 0);
+            setTotalPages(response.totalPages || 1);
         } catch (error: any) {
-            const errorMsg = error.response?.data?.Message || "An error occurred during search.";
-            alert(errorMsg);
+            alert(error.response?.data?.Message || "An error occurred during search.");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [filters, pageNumber, pageSize]);
+
+    useEffect(() => {
+        if (filters.startDate && filters.endDate) {
+            fetchData();
+        }
+    }, [pageNumber, fetchData]);
+
+    const handleSearchClick = () => fetchData(true);
 
     const handleReset = () => {
         setFilters({
-            teamMemberId: '',
+            teamMemberId: isUserAdmin ? '' : (currentUser?.id || ''),
             clientId: '',
             projectId: '',
             categoryId: '',
@@ -90,14 +116,59 @@ export const ReportsPage: React.FC = () => {
             endDate: ''
         });
         setReportData([]);
+        setPageNumber(1);
     };
 
-    const totalHours = reportData.reduce((acc, curr) => acc + curr.time + curr.overTime, 0);
+    const currentPageTotalHours = reportData.reduce((acc, curr) => acc + curr.time + curr.overTime, 0);
 
-    const exportToExcel = () => {
-        if (reportData.length === 0) return alert("No data to export!");
+    const handleExport = async (format: 'excel' | 'pdf' | 'print') => {
+        let dataToExport: ActivityDTO[] = [];
 
-        const worksheetData = reportData.map(item => ({
+        if (exportRange === 'current') {
+            dataToExport = reportData;
+        } else {
+            setIsLoading(true);
+            try {
+                let allItems: ActivityDTO[] = [];
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    const query: ReportQueryDTO = {
+                        memberId: filters.teamMemberId || null,
+                        clientId: filters.clientId || null,
+                        projectId: filters.projectId || null,
+                        categoryId: filters.categoryId || null,
+                        startDate: filters.startDate,
+                        endDate: filters.endDate,
+                        pageNumber: i,      
+                        pageSize: pageSize  
+                    };
+
+                    const response = await activityService.searchActivities(query);
+                    if (response.items) {
+                        allItems = [...allItems, ...response.items];
+                    }
+                }
+                
+                dataToExport = allItems;
+
+            } catch (error) {
+                console.error("Export error:", error);
+                alert("Error gathering data from all pages.");
+                return;
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        const totalToDisplay = dataToExport.reduce((acc, curr) => acc + curr.time + curr.overTime, 0);
+
+        if (format === 'excel') exportToExcel(dataToExport, totalToDisplay);
+        else if (format === 'pdf') createPDF(dataToExport, totalToDisplay);
+        else if (format === 'print') handlePrint(dataToExport, totalToDisplay);
+    };
+    
+    const exportToExcel = (data: ActivityDTO[], total: number) => {
+        const worksheetData = data.map(item => ({
             Date: new Date(item.date).toLocaleDateString(),
             'Team Member': item.memberName,
             Project: item.projectName,
@@ -105,41 +176,23 @@ export const ReportsPage: React.FC = () => {
             Description: item.description,
             'Time (h)': item.time + item.overTime
         }));
-
-        worksheetData.push({
-            Date: 'TOTAL',
-            'Team Member': '',
-            Project: '',
-            Category: '',
-            Description: '',
-            'Time (h)': totalHours
-        });
+        
+        worksheetData.push({ Date: '', 'Team Member': '', Project: '', Category: '', Description: 'TOTAL:', 'Time (h)': total } as any);
 
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "TimeSheet Report");
-        
-        XLSX.writeFile(workbook, `TimeSheet_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+        XLSX.writeFile(workbook, `TimeSheet_Report.xlsx`);
     };
 
-    const createPDF = () => {
-        if (reportData.length === 0) return alert("No data to export!");
-
+    const createPDF = (data: ActivityDTO[], total: number) => {
         const doc = new jsPDF();
-
         doc.addFileToVFS('Roboto-Regular.ttf', robotoBase64);
         doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
         doc.setFont('Roboto'); 
-
-        doc.setFontSize(18);
         doc.text("TimeSheet Report", 14, 15);
-        
-        doc.setFontSize(10);
-        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
 
-        const tableColumn = ["Date", "Team member", "Projects", "Categories", "Description", "Time"];
-        
-        const tableRows = reportData.map(item => [
+        const tableRows = data.map(item => [
             new Date(item.date).toLocaleDateString(),
             item.memberName,
             item.projectName,
@@ -149,25 +202,24 @@ export const ReportsPage: React.FC = () => {
         ]);
 
         autoTable(doc, {
-            head: [tableColumn],
+            head: [["Date", "Team member", "Projects", "Categories", "Description", "Time"]],
             body: tableRows,
-            startY: 30,
-            theme: 'striped',
-            styles: { 
-                font: 'Roboto',
-                fontStyle: 'normal',
-                fontSize: 10 
-            },
-            headStyles: { 
-                fillColor: [243, 108, 33] 
-            }
+            startY: 25,
+            styles: { font: 'Roboto' },
+            headStyles: { fillColor: [243, 108, 33] }
         });
 
         const finalY = (doc as any).lastAutoTable.finalY;
-        doc.setFontSize(12);
-        doc.text(`Report total: ${totalHours}h`, 14, finalY + 10);
+        doc.text(`Report total: ${total}h`, 14, finalY + 10);
+        doc.save(`TimeSheet_Report.pdf`);
+    };
 
-        doc.save(`TimeSheet_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    const handlePrint = (data: ActivityDTO[], total: number) => {
+        if (exportRange === 'all') {
+            alert("For full report printing, please use 'Create PDF' and print the document.");
+            return;
+        }
+        window.print();
     };
 
     return (
@@ -180,11 +232,16 @@ export const ReportsPage: React.FC = () => {
                 <div className="filter-grid">
                     <div className="filter-group">
                         <label>Team member:</label>
-                        <select value={filters.teamMemberId} onChange={(e) => setFilters({...filters, teamMemberId: e.target.value})}>
+                        <select 
+                            value={filters.teamMemberId} 
+                            onChange={(e) => setFilters({...filters, teamMemberId: e.target.value})}
+                            disabled={!isUserAdmin} 
+                        >
                             <option value="">All</option>
                             {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
                     </div>
+
                     <div className="filter-group">
                         <label>Client:</label>
                         <select value={filters.clientId} onChange={(e) => setFilters({...filters, clientId: e.target.value})}>
@@ -217,7 +274,7 @@ export const ReportsPage: React.FC = () => {
                 </div>
                 <div className="filter-actions">
                     <button className="reset-btn" onClick={handleReset}>Reset</button>
-                    <button className="search-btn" onClick={handleSearch} disabled={isLoading}>
+                    <button className="search-btn" onClick={handleSearchClick} disabled={isLoading}>
                         {isLoading ? 'Searching...' : 'Search'}
                     </button>
                 </div>
@@ -235,35 +292,44 @@ export const ReportsPage: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {reportData.length > 0 ? (
-                        reportData.map(item => (
-                            <tr key={item.id}>
-                                <td>{new Date(item.date).toLocaleDateString()}</td>
-                                <td>{item.memberName}</td>
-                                <td>{item.projectName}</td>
-                                <td>{item.categoryName}</td>
-                                <td>{item.description}</td>
-                                <td className="text-right">{item.time + item.overTime}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={6} style={{textAlign: 'center', padding: '30px', color: '#999'}}>
-                                No activities found for the selected criteria.
-                            </td>
+                    {reportData.map(item => (
+                        <tr key={item.id}>
+                            <td>{new Date(item.date).toLocaleDateString()}</td>
+                            <td>{item.memberName}</td>
+                            <td>{item.projectName}</td>
+                            <td>{item.categoryName}</td>
+                            <td>{item.description}</td>
+                            <td className="text-right">{item.time + item.overTime}</td>
                         </tr>
-                    )}
+                    ))}
                 </tbody>
             </table>
 
+            <div className="pagination">
+                <button className="page-btn" disabled={pageNumber === 1 || isLoading} onClick={() => setPageNumber(prev => prev - 1)}>Previous</button>
+                <span className="page-info">Page {pageNumber} of {totalPages}</span>
+                <button className="page-btn" disabled={pageNumber >= totalPages || isLoading} onClick={() => setPageNumber(prev => prev + 1)}>Next</button>
+            </div>
+
             <div className="reports-footer">
-                <div className="export-actions">
-                    <button className="export-btn" onClick={() => window.print()}>Print report</button>
-                    <button className="export-btn" onClick={createPDF}>Create PDF</button>
-                    <button className="export-btn" onClick={exportToExcel}>Export to excel</button>
+                <div className="export-container">
+                    <div className="export-range-selector">
+                        <span>Export scope:</span>
+                        <label>
+                            <input type="radio" name="range" checked={exportRange === 'current'} onChange={() => setExportRange('current')} /> Current Page
+                        </label>
+                        <label>
+                            <input type="radio" name="range" checked={exportRange === 'all'} onChange={() => setExportRange('all')} /> All Results
+                        </label>
+                    </div>
+                    <div className="export-actions">
+                        <button className="export-btn" onClick={() => handleExport('print')}>Print report</button>
+                        <button className="export-btn" onClick={() => handleExport('pdf')}>Create PDF</button>
+                        <button className="export-btn" onClick={() => handleExport('excel')}>Export to excel</button>
+                    </div>
                 </div>
                 <div className="report-total">
-                    Report total: <span>{totalHours}</span>
+                    Report total: <span>{currentPageTotalHours}h</span>
                 </div>
             </div>
         </div>

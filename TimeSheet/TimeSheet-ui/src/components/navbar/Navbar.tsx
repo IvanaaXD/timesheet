@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import { isAdmin as checkAdminStatus } from '../../utils/authUtils'; // Tvoj helper
 import './Navbar.css'; 
 import logoImage from '../../assets/logo.png';
 
 export const Navbar: React.FC = () => {
     const navigate = useNavigate();
+    const isUserAdmin = checkAdminStatus();
     
     const userString = localStorage.getItem('user');
     const user = userString ? JSON.parse(userString) : null;
+
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        return localStorage.getItem('theme') === 'dark';
+    });
+
+    useEffect(() => {
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [isDarkMode]);
 
     const handleLogout = async () => {
         await authService.logout();
@@ -18,12 +34,19 @@ export const Navbar: React.FC = () => {
     return (
         <header className="navbar-header">
             <div className="top-bar">
-
                 <div className="logo">
                     <img src={logoImage} alt="Vega IT Sourcing" />
                 </div>
                 
                 <div className="user-info">
+                    <button 
+                        className="theme-toggle" 
+                        onClick={() => setIsDarkMode(!isDarkMode)}
+                        title="Toggle Dark/Light Mode"
+                    >
+                        {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+                    </button>
+
                     <span className="user-name">{user?.username || 'Guest'}</span>
                     <span className="separator">|</span>
                     <button onClick={handleLogout} className="logout-btn">Logout</button>

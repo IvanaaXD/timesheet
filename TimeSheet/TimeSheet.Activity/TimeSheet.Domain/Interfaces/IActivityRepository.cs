@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TimeSheet.Domain.Entities;
+using TimeSheet.Domain.Common.Models;
 
 namespace TimeSheet.Domain.Interfaces
 {
@@ -12,12 +13,15 @@ namespace TimeSheet.Domain.Interfaces
         Task<Activity> AddActivityAsync(Activity activity);
         //Task UpdateActivityAsync(Activity activity);
         //Task DeleteActivityAsync(Activity activity);
-        Task<IEnumerable<Activity>> SearchActivitiesAsync(
+        Task<PagedList<Activity>> SearchActivitiesAsync(
             Guid? memberId,
             Guid? clientId,
             Guid? projectId,
             Guid? categoryId,
             DateOnly? startDate,
-            DateOnly? endDate);
+            DateOnly? endDate,
+            int pageNumber,
+            int pageSize,
+            string order = "desc");       
     }
 }

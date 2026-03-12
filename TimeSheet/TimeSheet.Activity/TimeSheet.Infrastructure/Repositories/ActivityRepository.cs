@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TimeSheet.Domain.Entities;
 using TimeSheet.Domain.Interfaces;
+using TimeSheet.Domain.Common.Models;
 using TimeSheet.Infrastructure.Data;
 
 namespace TimeSheet.Infrastructure.Repositories
@@ -54,15 +55,19 @@ namespace TimeSheet.Infrastructure.Repositories
             return activity;
         }
 
-        public async Task<IEnumerable<Activity>> SearchActivitiesAsync(
+        public async Task<PagedList<Activity>> SearchActivitiesAsync(
             Guid? memberId, 
             Guid? clientId,
             Guid? projectId,
             Guid? categoryId,
             DateOnly? startDate,
-            DateOnly? endDate)
+            DateOnly? endDate,
+            int pageNumber,
+            int pageSize,
+            string order = "desc")
+
         {
-            IQueryable<Activity> query = _context.Activities;
+            IQueryable<Activity> query = GetActivitiesWithIncludes().AsNoTracking();
 
             if (memberId.HasValue)
                 query = query.Where(a => a.MemberId == memberId.Value);
@@ -82,13 +87,31 @@ namespace TimeSheet.Infrastructure.Repositories
             if (endDate.HasValue)
                 query = query.Where(a => a.Date <= endDate.Value);
 
-            return await query
-                .Include(a => a.Project)
-                    .ThenInclude(p => p.Client)
-                .Include(a => a.Member)
-                .Include(a => a.Category)
-                .OrderByDescending(a => a.Date).AsNoTracking()
-                .ToListAsync();
+
+            query = order.ToLower() == "desc"
+                    ? query.OrderByDescending(a => a.Date).ThenByDescending(a => a.Id)
+                    : query.OrderBy(a => a.Date).ThenBy(a => a.Id);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                    .Include(a => a.Project)
+                        .ThenInclude(p => p.Client)
+                    .Include(a => a.Member)
+                    .Include(a => a.Category)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+            //return await query
+            //    .Include(a => a.Project)
+            //        .ThenInclude(p => p.Client)
+            //    .Include(a => a.Member)
+            //    .Include(a => a.Category)
+            //    .OrderByDescending(a => a.Date).AsNoTracking()
+            //    .ToListAsync();
+
+            return new PagedList<Activity>(items, totalCount, pageNumber, pageSize, null);
+
         }
     }
 }

@@ -7,8 +7,11 @@ import { ClientDTO } from '../../types/client';
 import { MemberDTO } from '../../types/member';
 import './ProjectsPage.css';
 import { CreateProjectModal } from './CreateProjectModal';
+import { isAdmin as checkAdminStatus } from '../../utils/authUtils';
 
 export const ProjectsPage: React.FC = () => {
+
+    const isUserAdmin = checkAdminStatus();
 
     const [projects, setProjects] = useState<ProjectDTO[]>([]);
     const [clients, setClients] = useState<ClientDTO[]>([]);
@@ -95,12 +98,13 @@ export const ProjectsPage: React.FC = () => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        if (!isUserAdmin) return;
         const { name, value } = e.target;
-        
         setEditFormData(prev => prev ? { ...prev, [name]: value } : null);
     };
 
     const handleArchiveToggle = (checked: boolean) => {
+        if (!isUserAdmin) return;
         setEditFormData(prev => {
             if (!prev) return null;
             return {
@@ -111,7 +115,7 @@ export const ProjectsPage: React.FC = () => {
     };
 
     const handleSave = async (id: string) => {
-        if (!editFormData) return;
+        if (!editFormData || !isUserAdmin) return;
         try {
             await projectService.updateProject(id, editFormData);
             setExpandedProjectId(null);
@@ -122,6 +126,7 @@ export const ProjectsPage: React.FC = () => {
     };
 
     const handleDelete = async (id: string) => {
+        if (!isUserAdmin) return;
         if (!window.confirm("Delete this project?")) return;
         try {
             await projectService.deleteProject(id);
@@ -138,9 +143,12 @@ export const ProjectsPage: React.FC = () => {
             </div>
 
             <div className="top-controls">
-                <button className="create-btn" onClick={() => setIsCreateModalOpen(true)}>
-                    + Create new project
-                </button>                
+                {isUserAdmin && (
+                    <button className="create-btn" onClick={() => setIsCreateModalOpen(true)}>
+                        + Create new project
+                    </button>
+                )}
+                
                 <div className="search-box">
                     <input 
                         type="text" 
@@ -152,7 +160,7 @@ export const ProjectsPage: React.FC = () => {
             </div>
 
             <CreateProjectModal 
-                isOpen={isCreateModalOpen}
+                isOpen={isUserAdmin && isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSuccess={handleCreateSuccess}
                 clients={clients}   
@@ -184,22 +192,42 @@ export const ProjectsPage: React.FC = () => {
                                         <div className="form-grid">
                                             <div className="input-group">
                                                 <label>Project name:</label>
-                                                <input name="name" value={editFormData?.name || ''} onChange={handleInputChange} />
+                                                <input 
+                                                    name="name" 
+                                                    value={editFormData?.name || ''} 
+                                                    onChange={handleInputChange} 
+                                                    readOnly={!isUserAdmin} 
+                                                />
                                             </div>
                                             <div className="input-group">
                                                 <label>Description:</label>
-                                                <input name="description" value={editFormData?.description || ''} onChange={handleInputChange} />
+                                                <input 
+                                                    name="description" 
+                                                    value={editFormData?.description || ''} 
+                                                    onChange={handleInputChange} 
+                                                    readOnly={!isUserAdmin} 
+                                                />
                                             </div>
                                             <div className="input-group">
                                                 <label>Customer:</label>
-                                                <select name="clientId" value={editFormData?.clientId || ''} onChange={handleInputChange}>
+                                                <select 
+                                                    name="clientId" 
+                                                    value={editFormData?.clientId || ''} 
+                                                    onChange={handleInputChange}
+                                                    disabled={!isUserAdmin} 
+                                                >
                                                     <option value="">Select customer</option>
                                                     {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                                 </select>
                                             </div>
                                             <div className="input-group">
                                                 <label>Lead:</label>
-                                                <select name="currentLeadId" value={editFormData?.currentLeadId || ''} onChange={handleInputChange}>
+                                                <select 
+                                                    name="currentLeadId" 
+                                                    value={editFormData?.currentLeadId || ''} 
+                                                    onChange={handleInputChange}
+                                                    disabled={!isUserAdmin} 
+                                                >
                                                     <option value="">Select lead</option>
                                                     {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                                                 </select>
@@ -214,6 +242,7 @@ export const ProjectsPage: React.FC = () => {
                                                             value={ProjectStatus.ACTIVE} 
                                                             checked={editFormData?.status === ProjectStatus.ACTIVE} 
                                                             onChange={handleInputChange} 
+                                                            disabled={!isUserAdmin}
                                                         /> Active
                                                     </label>
                                                     <label>
@@ -223,6 +252,7 @@ export const ProjectsPage: React.FC = () => {
                                                             value={ProjectStatus.INACTIVE} 
                                                             checked={editFormData?.status === ProjectStatus.INACTIVE} 
                                                             onChange={handleInputChange} 
+                                                            disabled={!isUserAdmin} 
                                                         /> Inactive
                                                     </label>
                                                 </div>
@@ -232,16 +262,20 @@ export const ProjectsPage: React.FC = () => {
                                                             type="checkbox" 
                                                             checked={editFormData?.status === ProjectStatus.ARCHIVED} 
                                                             onChange={(e) => handleArchiveToggle(e.target.checked)} 
+                                                            disabled={!isUserAdmin} 
                                                         /> Archive
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="expanded-footer">
-                                        <button className="btn-save" onClick={() => handleSave(project.id)}>Save</button>
-                                        <button className="btn-delete" onClick={() => handleDelete(project.id)}>Delete</button>
-                                    </div>
+                                    
+                                    {isUserAdmin && (
+                                        <div className="expanded-footer">
+                                            <button className="btn-save" onClick={() => handleSave(project.id)}>Save</button>
+                                            <button className="btn-delete" onClick={() => handleDelete(project.id)}>Delete</button>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="project-card" onClick={() => toggleExpand(project)}>

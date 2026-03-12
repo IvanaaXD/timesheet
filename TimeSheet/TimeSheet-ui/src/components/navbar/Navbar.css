@@ -1,9 +1,39 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #4a4a4a;
+    --navbar-top-bg: #ffffff;
+    --card-bg: #f9f9f9;
+    --border-color: #eee;
+    --active-nav-bg: #ffffff;
+    --nav-text-active: #F36C21;
+    --shadow: rgba(0, 0, 0, 0.08);
+}
+
+.dark-mode {
+    --bg-color: #1e1e1e;
+    --text-color: #d4d4d4;
+    --navbar-top-bg: #252526;
+    --card-bg: #2d2d30;
+    --border-color: #404040;
+    --active-nav-bg: #1e1e1e;
+    --nav-text-active: #ff9d66;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+}
+
 .navbar-header {
     display: flex;
     flex-direction: column;
-    background-color: #ffffff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); 
+    background-color: var(--navbar-top-bg);
+    box-shadow: 0 4px 15px var(--shadow); 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s ease;
 }
 
 .top-bar {
@@ -11,7 +41,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 40px;
-    background-color: #ffffff;
 }
 
 .logo img {
@@ -19,17 +48,38 @@
     object-fit: contain;
 }
 
+.dark-mode .logo img {
+    filter: brightness(1.1); 
+}
+
 .user-info {
     display: flex;
     align-items: center;
     gap: 15px;
-    color: #4a4a4a;
+    color: var(--text-color);
     font-size: 15px;
     font-weight: 500;
 }
 
+.theme-toggle {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    border-color: #F36C21;
+    background-color: rgba(243, 108, 33, 0.1);
+}
+
 .separator {
-    color: #d1d1d1;
+    color: var(--border-color);
 }
 
 .logout-btn {
@@ -52,7 +102,7 @@
 
 .main-nav {
     display: flex;
-    background-color: #F36C21;
+    background-color: #F36C21; 
     padding: 0 40px;
     gap: 8px;
 }
@@ -75,8 +125,12 @@
 }
 
 .nav-item.active {
-    background-color: #ffffff; 
-    color: #F36C21;
+    background-color: var(--active-nav-bg); 
+    color: var(--nav-text-active);
     border-bottom: 4px solid #D95A15;
     box-shadow: inset 0 3px 0 #F36C21; 
+}
+
+.dark-mode .logo img {
+    filter: invert(1) hue-rotate(180deg) brightness(1.1) !important;
 }
