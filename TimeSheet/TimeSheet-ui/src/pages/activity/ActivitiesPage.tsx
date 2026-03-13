@@ -6,9 +6,14 @@ import { DateView } from './DateView';
 import { ProjectDTO } from '../../types/project';
 import { CategoryDTO } from '../../types/category';
 import { projectService } from '../../services/projectService';
+import { projectMemberService } from '../../services/projectMemberService';
 import { categoryService } from '../../services/categoryService';
 
 export const ActivitiesPage: React.FC = () => {
+
+    const userJson = localStorage.getItem('user');
+    const currentUser = userJson ? JSON.parse(userJson) : null;
+
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
     const [activitiesSummary, setActivitiesSummary] = useState<ActivitySummaryDTO | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -30,19 +35,25 @@ export const ActivitiesPage: React.FC = () => {
 
     useEffect(() => {
         const loadInitialData = async () => {
+
+            if (!currentUser?.id) return;
+
+            setIsLoading(true);
             try {
                 const [projData, catData] = await Promise.all([
-                    projectService.getAllProjects(), 
+                    projectMemberService.getProjectsByMember(currentUser.id), 
                     categoryService.getAllCategories()
                 ]);
                 setProjects(projData);
                 setCategories(catData);
             } catch (error) {
-                console.error("Greška pri učitavanju projekata/kategorija:", error);
+                console.error("Error while loading categories/projects:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
         loadInitialData();
-    }, []);
+    }, []); 
 
     useEffect(() => {
         fetchMonthData();
@@ -73,6 +84,39 @@ export const ActivitiesPage: React.FC = () => {
     };
 
     const handleSaveActivities = async (activitiesToSave: ActivityRequestDTO[]) => {
+        if (!selectedDate) return;
+
+        const dateStr = formatDateToDateOnly(selectedDate);
+
+        const newReqTime = activitiesToSave.reduce((acc, curr) => acc + Number(curr.time), 0);
+        const newReqOvertime = activitiesToSave.reduce((acc, curr) => acc + Number(curr.overTime), 0);
+
+        const existingActivitiesForDay = activitiesSummary?.activities.filter(a => 
+            a.date.startsWith(dateStr) && !activitiesToSave.some(newAct => (newAct as any).id === a.id)
+        ) || [];
+
+        const existingTime = existingActivitiesForDay.reduce((acc, curr) => acc + Number(curr.time), 0);
+        const existingOvertime = existingActivitiesForDay.reduce((acc, curr) => acc + Number(curr.overTime), 0);
+
+        const totalTime = existingTime + newReqTime;
+        const totalOvertime = existingOvertime + newReqOvertime;
+        const totalDayHours = totalTime + totalOvertime;
+
+        if (totalTime > 8) {
+            alert(`Standard working hours for this day cannot exceed 8 hours (total would be: ${totalTime}h).`);
+            return;
+        }
+
+        if (totalOvertime > 4) {
+            alert(`Overtime for this day cannot exceed 4 hours (total would be: ${totalOvertime}h).`);
+            return;
+        }
+
+        if (totalDayHours > 12) {
+            alert(`Total daily working hours cannot exceed 12 hours (total would be: ${totalDayHours}h).`);
+            return;
+        }
+
         setIsLoading(true);
         try {
             const savePromises = activitiesToSave.map(activity => 
@@ -80,14 +124,13 @@ export const ActivitiesPage: React.FC = () => {
             );
 
             await Promise.all(savePromises);
-
             alert("Activities successfully saved!");
             
             setView('monthly');
-            fetchMonthData();
+            fetchMonthData(); 
         } catch (error) {
             console.error("Failed to save activities:", error);
-            alert("Something went wrong while saving. Check the console.");
+            alert("Something went wrong while saving. Please check the console.");
         } finally {
             setIsLoading(false);
         }

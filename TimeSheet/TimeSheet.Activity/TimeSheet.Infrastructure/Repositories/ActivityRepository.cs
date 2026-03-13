@@ -102,14 +102,6 @@ namespace TimeSheet.Infrastructure.Repositories
                     .Take(pageSize)
                     .ToListAsync();
 
-            //return await query
-            //    .Include(a => a.Project)
-            //        .ThenInclude(p => p.Client)
-            //    .Include(a => a.Member)
-            //    .Include(a => a.Category)
-            //    .OrderByDescending(a => a.Date).AsNoTracking()
-            //    .ToListAsync();
-
             return new PagedList<Activity>(items, totalCount, pageNumber, pageSize, null);
 
         }

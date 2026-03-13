@@ -8,6 +8,8 @@ import { MemberDTO } from '../../types/member';
 import './ProjectsPage.css';
 import { CreateProjectModal } from './CreateProjectModal';
 import { isAdmin as checkAdminStatus } from '../../utils/authUtils';
+import { projectMemberService } from '../../services/projectMemberService';
+import { ManageMembersModal } from './ManageMembersModal';
 
 export const ProjectsPage: React.FC = () => {
 
@@ -29,6 +31,10 @@ export const ProjectsPage: React.FC = () => {
     const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const [projectMembers, setProjectMembers] = useState<{[key: string]: MemberDTO[]}>({});
+    const [isManageMembersOpen, setIsManageMembersOpen] = useState(false);
+    const [selectedProjectForTeam, setSelectedProjectForTeam] = useState<ProjectDTO | null>(null);
 
     const handleCreateSuccess = () => {
         setIsCreateModalOpen(false);
@@ -74,13 +80,18 @@ export const ProjectsPage: React.FC = () => {
         fetchProjects();
     }, [pageNumber, pageSize, searchTerm, selectedLetter, refreshTrigger]);
 
-    const toggleExpand = (project: ProjectDTO) => {
+    const toggleExpand = async (project: ProjectDTO) => {
         if (expandedProjectId === project.id) {
             setExpandedProjectId(null);
             setEditFormData(null);
         } else {
             setExpandedProjectId(project.id);
             
+            try {
+                const team = await projectMemberService.getMembersByProject(project.id);
+                setProjectMembers(prev => ({ ...prev, [project.id]: team }));
+            } catch (e) { console.error(e); }
+
             let initialStatus = project.status;
             if ((project.status as any) === 1) initialStatus = ProjectStatus.ACTIVE;
             if ((project.status as any) === 2) initialStatus = ProjectStatus.INACTIVE;
@@ -100,7 +111,17 @@ export const ProjectsPage: React.FC = () => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         if (!isUserAdmin) return;
         const { name, value } = e.target;
-        setEditFormData(prev => prev ? { ...prev, [name]: value } : null);
+
+        setEditFormData(prev => {
+            if (!prev) return null;
+
+            let finalValue: any = value;
+            if (name === 'currentLeadId' && value === "") {
+                finalValue = null;
+            }
+
+            return { ...prev, [name]: finalValue };
+        });
     };
 
     const handleArchiveToggle = (checked: boolean) => {
@@ -136,6 +157,21 @@ export const ProjectsPage: React.FC = () => {
         }
     };
 
+    const openManageTeam = (project: ProjectDTO) => {
+        setSelectedProjectForTeam(project);
+        setIsManageMembersOpen(true);
+    };
+
+    const handleTeamUpdateSuccess = async () => {
+        if (selectedProjectForTeam) {
+            try {
+                const team = await projectMemberService.getMembersByProject(selectedProjectForTeam.id);
+                setProjectMembers(prev => ({ ...prev, [selectedProjectForTeam.id]: team }));
+                setIsManageMembersOpen(false);
+            } catch (e) { console.error(e); }
+        }
+    };
+
     return (
         <div className="page-container">
             <div className="page-header">
@@ -166,6 +202,17 @@ export const ProjectsPage: React.FC = () => {
                 clients={clients}   
                 members={members}   
             />
+
+            {selectedProjectForTeam && (
+                <ManageMembersModal
+                    isOpen={isManageMembersOpen}
+                    onClose={() => setIsManageMembersOpen(false)}
+                    project={selectedProjectForTeam}
+                    allMembers={members}
+                    currentTeam={projectMembers[selectedProjectForTeam.id] || []}
+                    onSuccess={handleTeamUpdateSuccess}
+                />
+            )}
 
             <div className="alphabet-filter">
                 <button className={`letter-btn ${!selectedLetter ? 'active' : ''}`} onClick={() => setSelectedLetter(null)}>All</button>
@@ -228,7 +275,7 @@ export const ProjectsPage: React.FC = () => {
                                                     onChange={handleInputChange}
                                                     disabled={!isUserAdmin} 
                                                 >
-                                                    <option value="">Select lead</option>
+                                                    <option value="">No lead</option> 
                                                     {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                                                 </select>
                                             </div>
@@ -266,6 +313,26 @@ export const ProjectsPage: React.FC = () => {
                                                         /> Archive
                                                     </label>
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="project-team-section">
+                                            <div className="section-header">
+                                                <h3>Project Team</h3>
+                                                <button className="manage-team-btn" onClick={() => openManageTeam(project)}>
+                                                    ⚙ Manage Team
+                                                </button>
+                                            </div>
+                                            <div className="team-list">
+                                                {projectMembers[project.id]?.length > 0 ? (
+                                                    projectMembers[project.id].map(m => (
+                                                        <span key={m.id} className={`team-badge ${m.name === project.currentLeadName ? 'lead' : ''}`}>
+                                                            {m.name} {m.name === project.currentLeadName && "(Lead)"}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <p className="no-members">No members assigned yet.</p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -17,6 +17,5 @@ export const getUserRole = (): string | null => {
 
 export const isAdmin = (): boolean => {
     const role = getUserRole();
-    console.log(role)
     return role?.toLowerCase() === 'admin';
 };
