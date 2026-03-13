@@ -201,7 +201,7 @@ export const ClientsPage: React.FC = () => {
                                     <div className="expanded-body">
                                         <div className="form-grid">
                                             <div className="input-group">
-                                                <label>Client name:</label>
+                                                <label>Client name: </label>
                                                 <input 
                                                     type="text" 
                                                     name="name"
@@ -212,7 +212,7 @@ export const ClientsPage: React.FC = () => {
                                             </div>
                                             
                                             <div className="input-group">
-                                                <label>Address:</label>
+                                                <label>Address: </label>
                                                 <input 
                                                     type="text" 
                                                     name="address"
@@ -223,7 +223,7 @@ export const ClientsPage: React.FC = () => {
                                             </div>
                                             
                                             <div className="input-group">
-                                                <label>City:</label>
+                                                <label>City: </label>
                                                 <input 
                                                     type="text" 
                                                     name="city"
@@ -234,7 +234,7 @@ export const ClientsPage: React.FC = () => {
                                             </div>
                                             
                                             <div className="input-group">
-                                                <label>Zip/Postal code:</label>
+                                                <label>Postal code: </label>
                                                 <input 
                                                     type="text" 
                                                     name="zip"
@@ -245,7 +245,7 @@ export const ClientsPage: React.FC = () => {
                                             </div>
                                             
                                             <div className="input-group">
-                                                <label>Country:</label>
+                                                <label>Country: </label>
                                                 <select 
                                                     name="countryId"
                                                     value={editFormData?.countryId || ''}

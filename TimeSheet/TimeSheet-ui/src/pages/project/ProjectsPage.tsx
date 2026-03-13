@@ -80,6 +80,26 @@ export const ProjectsPage: React.FC = () => {
         fetchProjects();
     }, [pageNumber, pageSize, searchTerm, selectedLetter, refreshTrigger]);
 
+    useEffect(() => {
+        if (expandedProjectId && projects.length > 0) {
+            const updatedProject = projects.find(p => p.id === expandedProjectId);
+            
+            if (updatedProject) {
+
+                setEditFormData(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        name: updatedProject.name,
+                        description: updatedProject.description || '',
+                        clientId: clients.find(c => c.name === updatedProject.clientName)?.id || '',
+                        currentLeadId: members.find(m => m.name === updatedProject.currentLeadName)?.id || null,
+                    };
+                });
+            }
+        }
+    }, [projects, expandedProjectId, clients, members]);
+
     const toggleExpand = async (project: ProjectDTO) => {
         if (expandedProjectId === project.id) {
             setExpandedProjectId(null);
@@ -167,8 +187,12 @@ export const ProjectsPage: React.FC = () => {
             try {
                 const team = await projectMemberService.getMembersByProject(selectedProjectForTeam.id);
                 setProjectMembers(prev => ({ ...prev, [selectedProjectForTeam.id]: team }));
+
+                setRefreshTrigger(prev => prev + 1);
                 setIsManageMembersOpen(false);
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Error updating team display:", e); 
+            }
         }
     };
 
@@ -238,7 +262,7 @@ export const ProjectsPage: React.FC = () => {
                                     <div className="expanded-body">
                                         <div className="form-grid">
                                             <div className="input-group">
-                                                <label>Project name:</label>
+                                                <label>Project name: </label>
                                                 <input 
                                                     name="name" 
                                                     value={editFormData?.name || ''} 
@@ -247,7 +271,7 @@ export const ProjectsPage: React.FC = () => {
                                                 />
                                             </div>
                                             <div className="input-group">
-                                                <label>Description:</label>
+                                                <label>Description: </label>
                                                 <input 
                                                     name="description" 
                                                     value={editFormData?.description || ''} 
@@ -256,7 +280,7 @@ export const ProjectsPage: React.FC = () => {
                                                 />
                                             </div>
                                             <div className="input-group">
-                                                <label>Customer:</label>
+                                                <label>Customer: </label>
                                                 <select 
                                                     name="clientId" 
                                                     value={editFormData?.clientId || ''} 
@@ -268,7 +292,7 @@ export const ProjectsPage: React.FC = () => {
                                                 </select>
                                             </div>
                                             <div className="input-group">
-                                                <label>Lead:</label>
+                                                <label>Lead: </label>
                                                 <select 
                                                     name="currentLeadId" 
                                                     value={editFormData?.currentLeadId || ''} 
@@ -280,7 +304,7 @@ export const ProjectsPage: React.FC = () => {
                                                 </select>
                                             </div>
                                             <div className="input-group status-group">
-                                                <label>Status:</label>
+                                                <label>Status: </label>
                                                 <div className="radio-options">
                                                     <label>
                                                         <input 
@@ -319,9 +343,11 @@ export const ProjectsPage: React.FC = () => {
                                         <div className="project-team-section">
                                             <div className="section-header">
                                                 <h3>Project Team</h3>
-                                                <button className="manage-team-btn" onClick={() => openManageTeam(project)}>
-                                                    ⚙ Manage Team
-                                                </button>
+                                                {isUserAdmin && (
+                                                    <button className="manage-team-btn" onClick={() => openManageTeam(project)}>
+                                                        ⚙ Manage Team
+                                                    </button>
+                                                )}
                                             </div>
                                             <div className="team-list">
                                                 {projectMembers[project.id]?.length > 0 ? (

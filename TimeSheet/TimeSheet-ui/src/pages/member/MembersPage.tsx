@@ -152,30 +152,30 @@ export const MembersPage: React.FC = () => {
                                         <div className="expanded-body">
                                             <div className="form-grid">
                                                 <div className="input-group">
-                                                    <label>Name:</label>
+                                                    <label>Name: </label>
                                                     <input name="name" value={editFormData?.name || ''} onChange={handleInputChange} readOnly={!isUserAdmin} />
                                                 </div>
                                                 <div className="input-group">
-                                                    <label>Username:</label>
+                                                    <label>Username: </label>
                                                     <input name="username" value={editFormData?.username || ''} onChange={handleInputChange} readOnly={!isUserAdmin} />
                                                 </div>
                                                 <div className="input-group">
-                                                    <label>Status:</label>
+                                                    <label>Status: </label>
                                                     <div className="radio-group">
                                                         <label><input type="radio" name="status" value={MemberStatus.INACTIVE} checked={editFormData?.status === MemberStatus.INACTIVE} disabled={!isUserAdmin} onChange={() => setEditFormData(p => p ? {...p, status: MemberStatus.INACTIVE} : null)} /> Inactive:</label>
                                                         <label><input type="radio" name="status" value={MemberStatus.ACTIVE} checked={editFormData?.status === MemberStatus.ACTIVE} disabled={!isUserAdmin} onChange={() => setEditFormData(p => p ? {...p, status: MemberStatus.ACTIVE} : null)} /> Active:</label>
                                                     </div>
                                                 </div>
                                                 <div className="input-group">
-                                                    <label>Hours per week:</label>
+                                                    <label>Hours per week: </label>
                                                     <input type="number" name="hoursPerWeek" value={editFormData?.hoursPerWeek || 0} onChange={handleInputChange} readOnly={!isUserAdmin} />
                                                 </div>
                                                 <div className="input-group">
-                                                    <label>Email:</label>
+                                                    <label>Email: </label>
                                                     <input name="email" value={editFormData?.email || ''} onChange={handleInputChange} readOnly={!isUserAdmin} />
                                                 </div>
                                                 <div className="input-group">
-                                                    <label>Role:</label>
+                                                    <label>Role: </label>
                                                     <div className="radio-group">
                                                         <label><input type="radio" name="role" value={MemberRole.ADMIN} checked={editFormData?.role === MemberRole.ADMIN} disabled={!isUserAdmin} onChange={() => setEditFormData(p => p ? {...p, role: MemberRole.ADMIN} : null)} /> Admin:</label>
                                                         <label><input type="radio" name="role" value={MemberRole.WORKER} checked={editFormData?.role === MemberRole.WORKER} disabled={!isUserAdmin} onChange={() => setEditFormData(p => p ? {...p, role: MemberRole.WORKER} : null)} /> Worker:</label>

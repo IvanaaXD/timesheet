@@ -14,9 +14,8 @@ interface Props {
 }
 
 export const ManageMembersModal: React.FC<Props> = ({ isOpen, onClose, project, allMembers, currentTeam, onSuccess }) => {
-    // Čuvamo listu ID-jeva onih koji su u timu
+
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
-    // Čuvamo ID onoga ko je Lead
     const [leadId, setLeadId] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -76,7 +75,7 @@ export const ManageMembersModal: React.FC<Props> = ({ isOpen, onClose, project, 
             onClose();
         } catch (error) {
             console.error("Error saving team:", error);
-            alert("Došlo je do greške prilikom ažuriranja tima.");
+            alert("Error happend while updating the team.");
         } finally {
             setIsSaving(false);
         }
@@ -102,7 +101,7 @@ export const ManageMembersModal: React.FC<Props> = ({ isOpen, onClose, project, 
                     <div className="team-list-scrollable">
                         <div className="team-member-row no-lead-option">
                             <span className="member-name"><em>None (No lead assigned)</em></span>
-                            <div className="col-check"></div> {/* Prazno jer "None" nije član tima */}
+                            <div className="col-check"></div> 
                             <div className="col-lead">
                                 <input 
                                     type="radio" 

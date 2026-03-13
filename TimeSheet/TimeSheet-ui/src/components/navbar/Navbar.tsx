@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { isAdmin as checkAdminStatus } from '../../utils/authUtils'; // Tvoj helper
 import './Navbar.css'; 
@@ -34,10 +34,12 @@ export const Navbar: React.FC = () => {
     return (
         <header className="navbar-header">
             <div className="top-bar">
-                <div className="logo">
-                    <img src={logoImage} alt="Vega IT Sourcing" />
-                </div>
-                
+                <Link to="/" className="logo-link">
+                    <div className="logo">
+                        <img src={logoImage} alt="Vega IT Sourcing" />
+                    </div>
+                </Link>
+                        
                 <div className="user-info">
                     <button 
                         className="theme-toggle" 
