@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import { memberService } from '../../services/memberService'; 
 import './LoginPage.css';
 import logoImage from '../../assets/logo.png';
 
@@ -9,9 +10,9 @@ export const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null); 
     const [isLoading, setIsLoading] = useState(false);
 
-    // Proveravamo inicijalno stanje teme sa body elementa
     const [isDarkMode, setIsDarkMode] = useState(() => 
         document.body.classList.contains('dark-mode')
     );
@@ -29,6 +30,7 @@ export const LoginPage: React.FC = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
         setIsLoading(true);
 
         try {
@@ -42,9 +44,30 @@ export const LoginPage: React.FC = () => {
         }
     };
 
+    const handleForgotPassword = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        setError(null);
+        setSuccess(null);
+
+        if (!username) {
+            setError('Please enter your username before clicking Forgot Password.');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await memberService.forgotPassword(username);
+            setSuccess('A password reset request has been sent to your email.');
+        } catch (err: any) {
+            setError('User not found. Please check your credentials.');
+            console.error('Forgot password error:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="login-page-container">
-            {/* Dugme za promenu teme u gornjem desnom uglu */}
             <button className="theme-toggle-btn" onClick={toggleTheme}>
                 {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
             </button>
@@ -60,7 +83,9 @@ export const LoginPage: React.FC = () => {
                     <h2 className="login-title">LOGIN</h2>
                     
                     <form onSubmit={handleLogin}>
+                        {/* Prikaz grešaka i uspeha */}
                         {error && <div className="error-message">{error}</div>}
+                        {success && <div className="success-message">{success}</div>}
 
                         <div className="form-group">
                             <input
@@ -78,7 +103,7 @@ export const LoginPage: React.FC = () => {
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                required
+                                required={!success} // Nije obavezno ako samo resetujemo lozinku
                             />
                         </div>
 
@@ -89,9 +114,15 @@ export const LoginPage: React.FC = () => {
                             </div>
                             
                             <div className="actions">
-                                <a href="#" className="forgot-password">Forgot password?</a>
+                                <a 
+                                    href="#" 
+                                    className="forgot-password" 
+                                    onClick={handleForgotPassword}
+                                >
+                                    Forgot password?
+                                </a>
                                 <button type="submit" className="login-button" disabled={isLoading}>
-                                    {isLoading ? 'Logging in...' : 'Login'}
+                                    {isLoading ? 'Processing...' : 'Login'}
                                 </button>
                             </div>
                         </div>

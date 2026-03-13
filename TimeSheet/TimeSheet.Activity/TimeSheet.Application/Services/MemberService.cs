@@ -143,6 +143,20 @@ namespace TimeSheet.Application.Services
             return _mapper.Map<MemberDTO>(updatedMember);
         }
 
+        public async Task<MemberDTO> ForgotPasswordAsync(string username)
+        {
+            var existingMember = await _memberRepository.FindMemberByUsernameAsync(username);
+            if (existingMember == null) throw new NotFoundException($"Member with username {username} not found.");
+
+            string plainPassword = GenerateRandomPassword(10);
+            existingMember.Password = _passwordHasher.HashPassword(plainPassword);
+
+            await _emailService.SendPasswordUpdatedEmailAsync(existingMember.Email, plainPassword);
+
+            var updatedMember = await _memberRepository.UpdateMemberAsync(existingMember);
+            return _mapper.Map<MemberDTO>(updatedMember);
+        }
+
         public async Task DeleteMemberAsync(Guid id)
         {
             var existingMember = await _memberRepository.FindMemberByIdAsync(id);

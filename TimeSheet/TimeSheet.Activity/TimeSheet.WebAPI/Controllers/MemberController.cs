@@ -24,12 +24,6 @@ namespace TimeSheet.WebAPI.Controllers
         public async Task<IActionResult> GetMemberById(Guid id)
         {
             var result = await _memberService.GetMemberByIdAsync(id);
-
-            if (result == null)
-            {
-                return NotFound(new { message = $"Member with ID {id} not found." });
-            }
-
             return Ok(result);
         }
 
@@ -70,6 +64,13 @@ namespace TimeSheet.WebAPI.Controllers
         public async Task<IActionResult> UpdateMemberPassword(Guid id)
         {
             var result = await _memberService.UpdateMemberPasswordAsync(id);
+            return Ok(result);
+        }
+
+        [HttpPut("forgot-password/{username}")]
+        public async Task<IActionResult> ForgotPassword(string username)
+        {
+            var result = await _memberService.ForgotPasswordAsync(username);
             return Ok(result);
         }
 

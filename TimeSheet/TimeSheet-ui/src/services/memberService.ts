@@ -36,6 +36,11 @@ export const memberService = {
         return response.data;
     },
 
+    forgotPassword: async (username: string): Promise<MemberDTO> => {
+        const response = await api.put<MemberDTO>(`${BASE_URL}/forgot-password/${username}`);
+        return response.data;
+    },
+
     deleteMember: async (id: string): Promise<void> => {
         await api.delete(`${BASE_URL}/${id}`);
     }

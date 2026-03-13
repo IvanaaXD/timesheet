@@ -18,6 +18,7 @@ namespace TimeSheet.Application.Abstractions
         Task<MemberDTO> CreateMemberAsync(MemberRequestDTO request);
         Task<MemberDTO> UpdateMemberAsync(Guid id, MemberRequestDTO request);
         Task<MemberDTO> UpdateMemberPasswordAsync(Guid id);
+        Task<MemberDTO> ForgotPasswordAsync(string username);
         Task DeleteMemberAsync(Guid id);
     }
 }
