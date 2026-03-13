@@ -6,12 +6,6 @@ A full-stack web application designed for tracking employee work hours, managing
 
 * **Interactive Calendar**: Monthly and daily views for logging activities.
 * **Team Management**: Admin tools to assign members to projects and designate Project Leads.
-* **Business Rule Validation**:
-* Maximum **8 hours** of standard time per day.
-* Maximum **4 hours** of overtime per day.
-* Total daily limit of **12 hours**.
-
-
 * **Reporting**: Export work logs to **PDF** and **Excel** formats.
 * **Dynamic UI**: Full **Dark Mode** support and responsive design.
 * **Role-Based Access**: Specialized views for Administrators and regular Members.
